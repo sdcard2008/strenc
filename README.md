@@ -1,5 +1,7 @@
 # STRENC : A String Encode/Decoder
 
+*v0.1.1*
+
 [**TestPyPi Link**](https://test.pypi.org/project/strenc/)
 
 ***Please note that strenc is currently under devolpement***

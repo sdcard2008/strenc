@@ -1,8 +1,10 @@
 # STRENC : A String Encode/Decoder
 
-*v0.1.1*
+*v0.1.2*
 
-[**TestPyPi Link**](https://test.pypi.org/project/strenc/)
+[**PyPi Link**](https://pypi.org/project/strenc/0.1.2/)
+
+*v0.1.0 and v0.1.1 can be found at[TestPyPi](https://test.pypi.org/project/strenc/)*
 
 ***Please note that strenc is currently under devolpement***
 
@@ -23,7 +25,7 @@ Honestly , I have no clue.
 ### How to install strenc
 If you have python installed , run this from your command prompt:
 ```batch 
-pip install -i https://test.pypi.org/simple/ strenc
+pip install strenc
 ```
 
 **Errors**
@@ -52,7 +54,7 @@ if value is all , then it will prompt you for every single chararcter. Else , it
 >I will not be adding ```-keypath [path_to_your_keys]``` from now on. But you should while doing anything besides generating a new key.
 - To get a copy of the current keys , simply add ```-copy true``` to your command.
 - To get the char that will replace a specific character , just add ```-k [specific_char]``` to your command , where ```[specific_char]``` is the character you are searching for.
-
+- From *v0.1.2* , you can make a config file using ```customizekeys -config [setup/specific_settings]```. You can set the key_path in the file so you don't have to put ```-keypath [path_to_your_keys]``` all the time. And to change a specific settings from specific section , just do ```-config [SECTION]/[settings]``` 
 ### STRENC module documentation
 
 ```strenc.load_keys(path : str)```

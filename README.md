@@ -1,8 +1,8 @@
 # STRENC : A String Encode/Decoder
-
-*v0.1.2*
-
+[![PyPI version](https://badge.fury.io/py/strenc.svg)](https://badge.fury.io/py/strenc) [![Downloads](https://pepy.tech/badge/strenc)](https://pepy.tech/project/strenc)
 [**PyPi Link**](https://pypi.org/project/strenc/0.1.2/)
+
+
 
 *v0.1.0 and v0.1.1 can be found at[TestPyPi](https://test.pypi.org/project/strenc/)*
 

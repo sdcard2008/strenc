@@ -6,7 +6,9 @@ import json as __json
 import argparse as __argparse
 import configparser as __configparser
 from os.path import exists as __exists
-__version__ = '0.1.2'
+from os import makedirs as __makedirs
+
+__version__ = '0.1.3'
 __author__ = 'Saptak De'
 
 config = __configparser.ConfigParser()
@@ -97,7 +99,11 @@ def __main():
     
     if args.Path:
         try:
-            new_key_file = open(f'{args.Path}/keys.json' , 'x')
+            if not __exists(args.Path):
+                __makedirs(args.Path)
+            new_key_file = open(f'{args.Path}/keys.json' , 'x')    
+                 
+                            
             ALPHABETS = 'abcdefghijklmnopqrstuvwxyz1234567890`~!@#$%^&*()-_=+[{]}\\|;:\'\",<.>/?'
             default_keys = {}
             for letter in ALPHABETS:

@@ -42,10 +42,20 @@ pip install strenc
 - To generate a keys.json file run this command:
     ```customizekeys -genkeys [where_you_want_to_put_keys]```
 put your desired path instead of ```[where_you_want_to_put_keys]```
+Also , if you want to generate the file in a relative path , add a *.* before the path.
+For example , let's say we have this folder here:
+```
+sample-py
+    -main.py
+```
+
+so if we want to make a keys.json file there , we have to do:
+```customizekeys -genkeys ./```
 
 
 
->*P.S : Currently , it cannot make folders if not found. So make the folders , then run the command.*    
+
+>*P.S : before v0.1.3 , it cannot make folders if not found. So make the folders , then run the command.*    
 - To do anything besides make a new keys.json file , you have to add the arguement ```-keypath [path_to_your_keys]```
 where , ```[path_to_your_keys]``` is where your keys.json file is located.
 for example , lets say path to the key is ```./path/to/key/keys.json```

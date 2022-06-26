@@ -7,11 +7,12 @@ import argparse as __argparse
 import configparser as __configparser
 from os.path import exists as __exists
 from os import makedirs as __makedirs
+from random import choice as __choice 
 
-__version__ = '0.1.3'
+__version__ = '0.1.4'
 __author__ = 'Saptak De'
 
-config = __configparser.ConfigParser()
+__config = __configparser.ConfigParser()
 
 
 def __main():
@@ -26,15 +27,17 @@ def __main():
     parser.add_argument('-keypath' , '--KeyPath' , help="Loaction of keys.json")
     parser.add_argument('-version' , '--ShowOrNot' , help="Outputs installed version of strenc")
     parser.add_argument('-config' , '--ConfigType' , help="Setup or update config")
+    parser.add_argument('-genkeystype' , '--GenKeyType' , help='Key generator options. Wont work if -genkeys not given')
+
     args = parser.parse_args()
 
     if args.KeyPath:
         path_to_keys = args.KeyPath
     elif __exists('key-config.ini'):
-        config.read('key-config.ini')
+        __config.read('key-config.ini')
 
         try:
-            path_to_keys = config.get('KEYPATH' , 'keypath')
+            path_to_keys = __config.get('KEYPATH' , 'keypath')
         except:
             print('No keypath settings in KEYPATH section in key-config.ini. -k , -copy , -change will not work')    
     else:
@@ -98,23 +101,37 @@ def __main():
     
     
     if args.Path:
-        try:
-            if not __exists(args.Path):
-                __makedirs(args.Path)
-            new_key_file = open(f'{args.Path}/keys.json' , 'x')    
-                 
-                            
-            ALPHABETS = 'abcdefghijklmnopqrstuvwxyz1234567890`~!@#$%^&*()-_=+[{]}\\|;:\'\",<.>/?'
-            default_keys = {}
-            for letter in ALPHABETS:
-                character_key = str.lower(input(f'Replace {letter} with : '))
+        if args.GenKeyType:
+            try:
+                
+                if not __exists(args.Path):
+                    __makedirs(args.Path)
+                new_key_file = open(f'{args.Path}/keys.json' , 'x')
+                ALPHABETS = 'abcdefghijklmnopqrstuvwxyz1234567890`~!@#$%^&*()-_=+[{]}\\|;:\'\",<.>/?'
+                default_keys = {}
+                if args.GenKeyType == 'manual':    
+                    for letter in ALPHABETS:
+                        character_key = str.lower(input(f'Replace {letter} with : '))
 
-                default_keys[letter] = character_key
-            __json.dump(default_keys , new_key_file , indent=4)
+                        default_keys[letter] = character_key
+                elif args.GenKeyType == 'random':
+                    ALPHABETS_LIST = list(ALPHABETS)
 
-            print(f'Created new keys.json file in {args.Path}')
-        except:
-            print('keys.json already exists')
+                    for letter in ALPHABETS:
+                        random_char = __choice(ALPHABETS_LIST)
+
+                        ALPHABETS_LIST.remove(random_char)
+
+                        default_keys[letter] = random_char
+                else:
+                    print('Either enter "manual" or "random" after -genkeystype. This will result in a empty "keys.json" file')        
+                __json.dump(default_keys , new_key_file , indent=4)
+
+                print(f'Created new keys.json file in {args.Path}')
+                
+
+            except:
+                print('keys.json already exists')
         
     if args.ShowOrNot:
         if args.ShowOrNot == 'show':
@@ -129,19 +146,19 @@ def __main():
             if not __exists('key-config.ini'):
                 
                 config_file = open('key-config.ini' , 'x')
-                config.read('keys-config.ini')
+                __config.read('keys-config.ini')
                 
 
                 sections_to_add = {'KEYPATH':['keypath'] ,  'DEFAULTKEYVALUES' : []}
 
                 for section,section_settings in sections_to_add.items():
-                    config.add_section(section)
+                    __config.add_section(section)
                     for setting in section_settings:
                         preffered_setting = input(f'Set {setting} from section {section} : ')
 
-                        config.set(section , setting , str.lower(preffered_setting))
+                        __config.set(section , setting , str.lower(preffered_setting))
 
-                config.write(config_file)
+                __config.write(config_file)
                 print('New key-config.ini in root directory is made.')
 
             else:
@@ -149,18 +166,18 @@ def __main():
         else:
             try:
                 config_file = open('key-config.ini' , 'r+')
-                config.read('key-config.ini')
+                __config.read('key-config.ini')
                 config_section , config_settings = args.ConfigType.split('/')
 
                 preffered_setting = input(f'Change {config_settings} from {config_section} : ')
 
-                config.set(config_section , config_settings , preffered_setting)
+                __config.set(config_section , config_settings , preffered_setting)
 
-                config.write(config_file)
+                __config.write(config_file)
                 print(f'Settings {config_settings} from {config_section} is updated to {preffered_setting}') 
             except:
                 print('key-config.ini does not exists. run -config setup to generate a new one.Or the specific setting does not exists')    
-
+    
             
 
 

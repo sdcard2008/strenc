@@ -40,7 +40,9 @@ pip install strenc
 ### customizekeys.exe (command line tool)
 
 - To generate a keys.json file run this command:
-    ```customizekeys -genkeys [where_you_want_to_put_keys]```
+    ```customizekeys -genkeys [where_you_want_to_put_keys] -genkeystype [manual/random]```
+    > ```-genkeystype [manual/random]``` is available from v0.1.4 . 
+    for ```-genkeystype``` , put either manual or random as your option. If manual , then you get to manually choose the keys for every character , else if random is choosen , you get a random key. 
 put your desired path instead of ```[where_you_want_to_put_keys]```
 Also , if you want to generate the file in a relative path , add a *.* before the path.
 For example , let's say we have this folder here:
@@ -50,7 +52,7 @@ sample-py
 ```
 
 so if we want to make a keys.json file there , we have to do:
-```customizekeys -genkeys ./```
+```customizekeys -genkeys ./ -genkeys[your_type]```
 
 
 
@@ -67,26 +69,34 @@ if value is all , then it will prompt you for every single chararcter. Else , it
 - To get a copy of the current keys , simply add ```-copy true``` to your command.
 - To get the char that will replace a specific character , just add ```-k [specific_char]``` to your command , where ```[specific_char]``` is the character you are searching for.
 - From *v0.1.2* , you can make a config file using ```customizekeys -config [setup/specific_settings]```. You can set the key_path in the file so you don't have to put ```-keypath [path_to_your_keys]``` all the time. And to change a specific settings from specific section , just do ```-config [SECTION]/[settings]``` 
+
+- From *v0.1.3* , you can check current version of strenc by running ```customizekeys -version show```
 ### STRENC module documentation
+> *From ```v0.1.4``` , the methods are stored in a class called ```Strenc```*
+
+```def __init__(self , key_path=None)```
+
+Constructor of the new ```Strenc``` class. ```key_path``` is an optional arguement which , if given , will load the key on initialization.
 
 ```strenc.load_keys(path : str)```
 
 ```python
-    def load_keys(path : str):
+    def load_keys(self ,path : str):
         #file name should be keys.json
         try:
             json_file = open(f'{path}/keys.json' , 'r+')
-
-            return json.load(json_file)
+            self.Keys = json.load(json_file)
         except:
             return False 
  ```
- Used to load the keys.json file. ```path``` should be a string. Returns either a dictionary or a boolean(False)
+ Used to load the keys.json file. ```path``` should be a string. Sets ```Keys``` variable from class Strenc to a dictionary.
 
- ```strenc.encode(keys : dict , msg : str , would_be_decoded_by_human : bool) ```
+ ```strenc.encode(self , msg : str , would_be_decoded_by_human : bool , keys : dict) ```
 
  ```python
- def encode(keys : dict , msg:str , will_be_decoded_later_by_human : bool = False):
+ def encode(self , msg:str , will_be_decoded_later_by_human : bool = False , keys : dict = None):
+    if keys is None:
+        keys = self.Keys
     try:
         msg_words = str.lower(msg).split()
 
@@ -103,13 +113,15 @@ if value is all , then it will prompt you for every single chararcter. Else , it
     except:
         return False
  ```
- Takes a dictionary with keys (preferably loaded with ```strenc.load_keys(path:str)```) , the message to encode , and an optional arguement if it would be manually put in a function (By default it's False).
+ Takes a dictionary with keys  , which can be either stored in a variable using ```strenc.return_keys(self , path : str)``` , or can be loaded using ```strenc.load_keys(self , path : str)```(preferably loaded with ```strenc.load_keys(path:str)```) , the message to encode , and an optional arguement if it would be manually put in a function (By default it's False).
  Returns the encoded message using the keys.
 
- ```strenc.decode(keys : dict , msg : str , would_be_encoded_by_human : bool)```
+ ```strenc.decode(self , keys : dict , msg : str , would_be_encoded_by_human : bool)```
 
  ```python
- def decode(keys : dict , msg:str , will_be_encoded_later_by_humans : bool = False):
+ def decode(self  , msg:str , will_be_encoded_later_by_humans : bool = False ,  keys : dict = None):
+    if keys is None:
+        keys = self.Keys
     try:
         msg_words = str.lower(msg).split()
 
@@ -118,7 +130,7 @@ if value is all , then it will prompt you for every single chararcter. Else , it
 
             for letter_index , letter in enumerate(word_letter):
                 
-                word_letter[letter_index] = __get_key_from_value(keys , letter)
+                word_letter[letter_index] = _get_key_from_value(keys , letter)
             msg_words[word_index] = "".join(word_letter)
         if will_be_encoded_later_by_humans:
             return repr(" ".join(msg_words))
@@ -129,13 +141,26 @@ if value is all , then it will prompt you for every single chararcter. Else , it
         return False 
 
  ```
- Arguements same as ```strenc.encode(keys : dict , msg : str , would_be_decoded_by_human : bool)```. Returns the decoded message from a encoded message. ```__get_key_from_value(keys : dict , char:str)``` is a function to get key from value.
+ Arguements same as ```strenc.encode(self , msg : str , would_be_decoded_by_human : bool , keys : dict)```. Returns the decoded message from a encoded message. ```_get_key_from_value(keys : dict , char:str)``` is a function to get key from value.
 
+```strenc.return_keys(self , path : dict)```
+
+```python
+def return_keys(self , path : str):
+    #file name should be keys.json
+    try:
+        json_file = open(f'{path}/keys.json' , 'r+')
+
+        return _json.load(json_file)
+    except:
+        return False
+```
+Same as ```strenc.load_keys(self , path : str)``` , but returns the dictionary of keys rather than storing it in a class variable.
 
  ```strenc.__get_key_from_value(keys : dict , char : str)```
 
  ```python
- def __get_key_from_value(actual_dict : dict , val):
+ def _get_key_from_value(actual_dict : dict , val):
     for key,value in actual_dict.items():
         if val == value:
             return key

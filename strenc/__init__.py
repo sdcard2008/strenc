@@ -5,7 +5,7 @@ import json as _json
 A very simple , customizable , string encoder and decoder.        
 """
 
-__version__ = "0.1.4"
+__version__ = "0.2.0"
 __author__ = "Saptak De"
 
 
@@ -39,18 +39,13 @@ class Strenc:
         if keys is None:
             keys = self.Keys
         try:
-            msg_words = str.lower(msg).split()
+            msg_letters = list(msg)
 
-            for word_index , word in enumerate(msg_words):
-                word_letter = list(word)
-
-                for letter_index , letter in enumerate(word_letter):
-                    word_letter[letter_index] = keys[letter]
-                msg_words[word_index] = "".join(word_letter)
-            
+            for letter_index ,letter in enumerate(msg_letters):
+                msg_letters[letter_index] = keys[letter]
             if will_be_decoded_later_by_human:
-                return repr(" ".join(msg_words))
-            return " ".join(msg_words)        
+                return repr("".join(msg_letters))
+            return "".join(msg_letters)    
         except:
             return False
     @classmethod
@@ -58,24 +53,18 @@ class Strenc:
         if keys is None:
             keys = self.Keys
         try:
-            msg_words = str.lower(msg).split()
+            msg_letters = list(msg)
 
-            for word_index , word in enumerate(msg_words):
-                word_letter = list(word)
-
-                for letter_index , letter in enumerate(word_letter):
-                    
-                    word_letter[letter_index] = _get_key_from_value(keys , letter)
-                msg_words[word_index] = "".join(word_letter)
+            for letter_index ,letter in enumerate(msg_letters):
+                msg_letters[letter_index] = _get_key_from_value(keys , letter)
             if will_be_encoded_later_by_humans:
-                return repr(" ".join(msg_words))
-            return " ".join(msg_words)
-
+                return repr("".join(msg_letters))
+            return "".join(msg_letters)
 
         except:
             return False 
 
-def _get_key_from_value(actual_dict : dict , val):
+def _get_key_from_value(actual_dict  , val):
     for key,value in actual_dict.items():
         if val == value:
             return key

@@ -8,8 +8,9 @@ import configparser as __configparser
 from os.path import exists as __exists
 from os import makedirs as __makedirs
 from random import choice as __choice 
+import string as _string
 
-__version__ = '0.1.4'
+__version__ = '0.2.0'
 __author__ = 'Saptak De'
 
 __config = __configparser.ConfigParser()
@@ -18,16 +19,20 @@ __config = __configparser.ConfigParser()
 def __main():
     parser = __argparse.ArgumentParser()
 
-    parser.add_argument('-k' , '--Key' , help="Get key of a specific char")
+    SYSTEM_ARGS = [
+        {'com' : '-k' , 'val' : '--Key' , 'help' : 'Get key of a specific char'} ,
+        {'com' : '-copy' , 'val' : '--Copy' , 'help' : 'Get a copy of the keys'} ,
+        {'com' : '-change' , 'val' : '--Type' , 'help' : 'Either change the whole key file or change a specific char'},
+        {'com' : '-genkeys' , 'val' : '--Path' , 'help' : 'Create a keys.json file in root directory'} ,
+        {'com' : '-keypath' , 'val' : '--KeyPath' , 'help' : 'Loaction of keys.json' } ,
+        {'com' : '-version' , 'val' : '--ShowOrNot' , 'help' : 'Outputs installed version of strenc'} ,
+        {'com' : '-config' , 'val' : '--ConfigType' , 'help' : 'Setup or update config(Please run this command at the same folder as keys.json)' } ,
+        {'com' : '-genkeystype' , 'val' : '--GenKeyType' , 'help' : 'Key generator options. Wont work if -genkeys not given'}
 
-    parser.add_argument('-copy' , '--Copy' , help="Get a copy of the keys")
-
-    parser.add_argument('-change' , '--Type' , help="Either change the whole key file or change a specific char")
-    parser.add_argument('-genkeys' , '--Path' , help="Create a keys.json file in root directory")
-    parser.add_argument('-keypath' , '--KeyPath' , help="Loaction of keys.json")
-    parser.add_argument('-version' , '--ShowOrNot' , help="Outputs installed version of strenc")
-    parser.add_argument('-config' , '--ConfigType' , help="Setup or update config")
-    parser.add_argument('-genkeystype' , '--GenKeyType' , help='Key generator options. Wont work if -genkeys not given')
+    ]
+    
+    for command in SYSTEM_ARGS:
+        parser.add_argument(command['com'] , command['val'] , help =command['help'])
 
     args = parser.parse_args()
 
@@ -52,7 +57,7 @@ def __main():
         print('Cannot find keys.json from given path. -k , -copy , -change will not work.')
 
 
-
+    type_with_genkeys = False
 
 
 
@@ -88,7 +93,7 @@ def __main():
         try:
             print(f'Key for {args.Key} is : {enc_keys[args.Key]}')
         except:
-            print('-k did not work. Either -keypath is wrong or it is absent. Or the alphabet does not exist in the keys.json file')    
+            print('-k did not work. Either -keypath is wrong or it is absent. Or the character does not exist in the keys.json file')    
     if args.Copy:
         if args.Copy == 'true':
             try:
@@ -102,16 +107,17 @@ def __main():
     
     if args.Path:
         if args.GenKeyType:
+            type_with_genkeys = True
             try:
                 
                 if not __exists(args.Path):
                     __makedirs(args.Path)
                 new_key_file = open(f'{args.Path}/keys.json' , 'x')
-                ALPHABETS = 'abcdefghijklmnopqrstuvwxyz1234567890`~!@#$%^&*()-_=+[{]}\\|;:\'\",<.>/?'
+                ALPHABETS = _string.printable
                 default_keys = {}
                 if args.GenKeyType == 'manual':    
                     for letter in ALPHABETS:
-                        character_key = str.lower(input(f'Replace {letter} with : '))
+                        character_key = str.lower(input(f'Replace {repr(letter)} with : '))
 
                         default_keys[letter] = character_key
                 elif args.GenKeyType == 'random':
@@ -126,12 +132,14 @@ def __main():
                 else:
                     print('Either enter "manual" or "random" after -genkeystype. This will result in a empty "keys.json" file')        
                 __json.dump(default_keys , new_key_file , indent=4)
-
+        
                 print(f'Created new keys.json file in {args.Path}')
                 
 
             except:
                 print('keys.json already exists')
+        else:
+            print('Please add -genkeystype [manual/random] after -genkeys')    
         
     if args.ShowOrNot:
         if args.ShowOrNot == 'show':
@@ -178,6 +186,7 @@ def __main():
             except:
                 print('key-config.ini does not exists. run -config setup to generate a new one.Or the specific setting does not exists')    
     
-            
+    if args.GenKeyType and not type_with_genkeys:
+        print('Run -genkeystype alongside -genkeys')        
 
 

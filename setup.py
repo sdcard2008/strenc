@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="strenc" ,
-    version="0.2.0" ,
+    version="0.2.1" ,
     description="A simple fully customizable string encoder and decoder" ,
     url="https://github.com/sdcard2008/strenc" ,  #will add later 
     author="Saptak De" ,

@@ -10,7 +10,7 @@ from os import makedirs as __makedirs
 from random import choice as __choice 
 import string as _string
 
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 __author__ = 'Saptak De'
 
 __config = __configparser.ConfigParser()
@@ -117,7 +117,7 @@ def __main():
                 default_keys = {}
                 if args.GenKeyType == 'manual':    
                     for letter in ALPHABETS:
-                        character_key = str.lower(input(f'Replace {repr(letter)} with : '))
+                        character_key = input(f'Replace {repr(letter)} with : ')
 
                         default_keys[letter] = character_key
                 elif args.GenKeyType == 'random':

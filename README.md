@@ -43,6 +43,8 @@ pip install strenc
     ```customizekeys -genkeys [where_you_want_to_put_keys] -genkeystype [manual/random]```
     > ```-genkeystype [manual/random]``` is available from v0.1.4 . 
     for ```-genkeystype``` , put either manual or random as your option. If manual , then you get to manually choose the keys for every character , else if random is choosen , you get a random key. 
+
+
 put your desired path instead of ```[where_you_want_to_put_keys]```
 Also , if you want to generate the file in a relative path , add a *.* before the path.
 For example , let's say we have this folder here:

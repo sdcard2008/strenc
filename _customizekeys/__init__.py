@@ -9,14 +9,23 @@ from os.path import exists as __exists
 from os import makedirs as __makedirs
 from random import choice as __choice 
 import string as _string
+import logging as __logging
 
-__version__ = '0.2.1'
+__version__ = '0.2.2'
 __author__ = 'Saptak De'
 
 __config = __configparser.ConfigParser()
 
+def __err_logging(debug : bool  , logger , err:Exception):
+    if debug == 'true':
+        logger.error(err)
+        return True
+    return False       
 
 def __main():
+    
+        
+
     parser = __argparse.ArgumentParser()
 
     SYSTEM_ARGS = [
@@ -35,6 +44,11 @@ def __main():
         parser.add_argument(command['com'] , command['val'] , help =command['help'])
 
     args = parser.parse_args()
+ 
+    
+    DEBUG = 'false'
+    
+    
 
     if args.KeyPath:
         path_to_keys = args.KeyPath
@@ -44,11 +58,19 @@ def __main():
         try:
             path_to_keys = __config.get('KEYPATH' , 'keypath')
         except:
-            print('No keypath settings in KEYPATH section in key-config.ini. -k , -copy , -change will not work')    
+            print('No keypath settings in KEYPATH section in key-config.ini. -k , -copy , -change will not work')
+        try:
+            DEBUG = __config.get('DEBUG' , 'show-debug')
+        except:
+            pass
+                        
+    
     else:
-        print('-keypath [key_path] is absent and key-config.ini is absent. -k , -copy , -change will not work')        
+        print('-keypath [key_path] is absent and key-config.ini is absent. -k , -copy , -change will not work') 
+              
 
-
+    if DEBUG == 'true':
+        __logging.basicConfig(filename='customizekeys.log' , filemode='w' , format='%(asctime)s - %(message)s')
     try:
         file_json = open(f'{path_to_keys}/keys.json' , 'r+')
         enc_keys = __json.load(file_json)
@@ -59,6 +81,8 @@ def __main():
 
     type_with_genkeys = False
 
+     
+
 
 
     
@@ -66,20 +90,25 @@ def __main():
         if args.Type == 'all':    
             try:
                 for enc_key_keys in letters_for_keys:
-                    replace_with = input(f'Replace {enc_key_keys} with :')
+                    replace_with = input(f'Replace {repr(enc_key_keys)} with :')
 
                     enc_keys[enc_key_keys] = replace_with
-            except:
-                print('-change did not work. Either -keypath is wrong or it is absent.')    
-        elif args.Type in letters_for_keys:
-            try:
-                replace_with = input(f'Replace {args.Type} with :')
-
-                enc_keys[args.Type] = replace_with
-            except:
+            except Exception as err:
+                __err_logging(DEBUG, __logging , err)
                 print('-change did not work. Either -keypath is wrong or it is absent.')    
         else:
-            print('Wrong input : Enter either "all" or a specific char')    
+            
+            try:
+                if args.Type in letters_for_keys:    
+                    replace_with = input(f'Replace {repr(args.Type)} with :')
+
+                    enc_keys[args.Type] = replace_with
+                else:
+                    print('Either input "all" or a specific character after -change')    
+            except Exception as err:
+                __err_logging(DEBUG, __logging , err)
+                print('-change did not work. Either -keypath is wrong or it is absent.')    
+            
         print('Dumping data to json....')
         try:
             file_json.seek(0)
@@ -87,18 +116,21 @@ def __main():
 
             __json.dump(enc_keys , file_json , indent=4)
             print('keys.json is updated')
-        except:
+        except Exception as err:
+            __err_logging(DEBUG, __logging , err)
             print('Dumping data to keys.json failed')    
     if args.Key:
         try:
-            print(f'Key for {args.Key} is : {enc_keys[args.Key]}')
-        except:
+            print(f'Key for {repr(args.Key)} is : {enc_keys[args.Key]}')
+        except Exception as err:
+            __err_logging(DEBUG, __logging , err)
             print('-k did not work. Either -keypath is wrong or it is absent. Or the character does not exist in the keys.json file')    
     if args.Copy:
         if args.Copy == 'true':
             try:
                 print(enc_keys)
-            except:
+            except Exception as err:
+                __err_logging(DEBUG, __logging , err)
                 print('-copy did not work. Either -keypath is wrong or it is absent.')    
         else:
             print('Please type "true" after -copy')
@@ -136,7 +168,8 @@ def __main():
                 print(f'Created new keys.json file in {args.Path}')
                 
 
-            except:
+            except Exception as err:
+                __err_logging(DEBUG, __logging , err)
                 print('keys.json already exists')
         else:
             print('Please add -genkeystype [manual/random] after -genkeys')    
@@ -157,7 +190,7 @@ def __main():
                 __config.read('keys-config.ini')
                 
 
-                sections_to_add = {'KEYPATH':['keypath'] ,  'DEFAULTKEYVALUES' : []}
+                sections_to_add = {'KEYPATH':['keypath'] ,  'DEBUG' : ['show-log']}
 
                 for section,section_settings in sections_to_add.items():
                     __config.add_section(section)
@@ -183,7 +216,8 @@ def __main():
 
                 __config.write(config_file)
                 print(f'Settings {config_settings} from {config_section} is updated to {preffered_setting}') 
-            except:
+            except Exception as err:
+                __err_logging(DEBUG, __logging , err)
                 print('key-config.ini does not exists. run -config setup to generate a new one.Or the specific setting does not exists')    
     
     if args.GenKeyType and not type_with_genkeys:

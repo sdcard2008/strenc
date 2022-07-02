@@ -11,7 +11,7 @@ from random import choice as __choice
 import string as _string
 import logging as __logging
 
-__version__ = '0.2.2'
+__version__ = '0.2.3'
 __author__ = 'Saptak De'
 
 __config = __configparser.ConfigParser()
@@ -60,7 +60,7 @@ def __main():
         except:
             print('No keypath settings in KEYPATH section in key-config.ini. -k , -copy , -change will not work')
         try:
-            DEBUG = __config.get('DEBUG' , 'show-debug')
+            DEBUG = __config.get('DEBUG' , 'show-log')
         except:
             pass
                         

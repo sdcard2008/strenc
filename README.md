@@ -39,6 +39,8 @@ pip install strenc
 
 ### customizekeys.exe (command line tool)
 
+>From v0.2.4 , the command line tool is renamed from ```customizekeys``` to ```strenc``` 
+
 - To generate a keys.json file run this command:
     ```customizekeys -genkeys [where_you_want_to_put_keys] -genkeystype [manual/random]```
     > ```-genkeystype [manual/random]``` is available from v0.1.4 . 
@@ -160,4 +162,54 @@ Same as ```strenc.load_keys(self , path : str)``` , but returns the dictionary o
             return key
     return False                
 
- ```        
+ ``` 
+
+ Return installed strenc version
+
+ ```strenc.version()```
+
+ ```python
+ def version(self):
+    return __version__
+ ```   
+Gets the value of a certain key.
+
+ ```strenc.get_val_of_key(self ,key , keys : dict = None)```
+
+```python 
+ def get_val_of_key(self ,key , keys : dict = None):
+        if keys is None:
+            keys = self.Keys
+        return keys[key]
+ ```  
+
+ Return the current keys.json file
+
+ ```strenc.get_keys(self)```
+
+ ```python
+ def get_keys(self):
+        if self.Keys is not None:
+            return self.Keys
+        else:
+            raise Exception('keys are not initialized')
+ ```
+
+ Changes a certain key from the keys dictionary. You can make it either temporary or permanent using ```permanent``` argument.
+
+ ```strenc.change_key(self , permanent : bool , key_to_change = None , val = None)```
+
+ ```python
+ def change_key(self , permanent : bool , key_to_change = None , val = None):
+        if self.Keys is None:
+            raise Exception('keys are not initialized')
+        self.Keys[key_to_change] = val
+
+        if permanent:
+            self.KeyFile.seek(0)
+            self.KeyFile.truncate(0)        
+            _json.dump(self.Keys , self.KeyFile , indent=4)   
+ ```
+
+
+

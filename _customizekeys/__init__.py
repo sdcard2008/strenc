@@ -1,21 +1,22 @@
 #DO NOT TOUCH
 #PROGRAM TO RUN COMMAND "customizekeys"
 
-
+#imports
 import json as __json
 import argparse as __argparse
 import configparser as __configparser
 from os.path import exists as __exists
 from os import makedirs as __makedirs
+from os import remove as __remove
 from random import choice as __choice 
 import string as _string
 import logging as __logging
 
-__version__ = '0.2.3'
+__version__ = '0.2.4'
 __author__ = 'Saptak De'
 
-__config = __configparser.ConfigParser()
-
+__config = __configparser.ConfigParser() # to parse strenc-config.ini
+# err logging func
 def __err_logging(debug : bool  , logger , err:Exception):
     if debug == 'true':
         logger.error(err)
@@ -26,8 +27,9 @@ def __main():
     
         
 
-    parser = __argparse.ArgumentParser()
+    parser = __argparse.ArgumentParser() # argument parser
 
+    # all the commands for 'strenc'
     SYSTEM_ARGS = [
         {'com' : '-k' , 'val' : '--Key' , 'help' : 'Get key of a specific char'} ,
         {'com' : '-copy' , 'val' : '--Copy' , 'help' : 'Get a copy of the keys'} ,
@@ -39,21 +41,21 @@ def __main():
         {'com' : '-genkeystype' , 'val' : '--GenKeyType' , 'help' : 'Key generator options. Wont work if -genkeys not given'}
 
     ]
-    
+    # add all the commands to the parser
     for command in SYSTEM_ARGS:
         parser.add_argument(command['com'] , command['val'] , help =command['help'])
 
-    args = parser.parse_args()
+    args = parser.parse_args() # initialize args getter
  
     
-    DEBUG = 'false'
+    DEBUG = 'false' # for log showing
     
     
-
+    # get config and do stuff accordingly
     if args.KeyPath:
         path_to_keys = args.KeyPath
-    elif __exists('key-config.ini'):
-        __config.read('key-config.ini')
+    elif __exists('strenc-config.ini'):
+        __config.read('strenc-config.ini')
 
         try:
             path_to_keys = __config.get('KEYPATH' , 'keypath')
@@ -66,11 +68,13 @@ def __main():
                         
     
     else:
-        print('-keypath [key_path] is absent and key-config.ini is absent. -k , -copy , -change will not work') 
+        print('-keypath [key_path] is absent and strenc-config.ini is absent. -k , -copy , -change will not work') 
               
-
+    # initialize a logger if DEBUG is set to true
     if DEBUG == 'true':
-        __logging.basicConfig(filename='customizekeys.log' , filemode='w' , format='%(asctime)s - %(message)s')
+        __logging.basicConfig(filename='strenc.log' , filemode='w' , format='%(asctime)s - %(message)s')
+    elif __exists('strenc.log') and DEBUG == 'false':
+        __remove('strenc.log')
     try:
         file_json = open(f'{path_to_keys}/keys.json' , 'r+')
         enc_keys = __json.load(file_json)
@@ -85,7 +89,7 @@ def __main():
 
 
 
-    
+    # replace a certain key
     if args.Type:
         if args.Type == 'all':    
             try:
@@ -119,12 +123,14 @@ def __main():
         except Exception as err:
             __err_logging(DEBUG, __logging , err)
             print('Dumping data to keys.json failed')    
+    # get value of a key
     if args.Key:
         try:
             print(f'Key for {repr(args.Key)} is : {enc_keys[args.Key]}')
         except Exception as err:
             __err_logging(DEBUG, __logging , err)
             print('-k did not work. Either -keypath is wrong or it is absent. Or the character does not exist in the keys.json file')    
+    # get a copy of current keys.json file
     if args.Copy:
         if args.Copy == 'true':
             try:
@@ -136,7 +142,7 @@ def __main():
             print('Please type "true" after -copy')
          
     
-    
+    # type of key generation. Either random or manual
     if args.Path:
         if args.GenKeyType:
             type_with_genkeys = True
@@ -173,21 +179,21 @@ def __main():
                 print('keys.json already exists')
         else:
             print('Please add -genkeystype [manual/random] after -genkeys')    
-        
+    # show current version of strenc    
     if args.ShowOrNot:
         if args.ShowOrNot == 'show':
             print(f'strenc version {__version__}')
         else:
             print("Please add 'show' after '-version'")
-
+    # make a config file
     if args.ConfigType:
         if args.ConfigType == 'setup':
             
             
-            if not __exists('key-config.ini'):
+            if not __exists('strenc-config.ini'):
                 
-                config_file = open('key-config.ini' , 'x')
-                __config.read('keys-config.ini')
+                config_file = open('strenc-config.ini' , 'x')
+                __config.read('strenc-config.ini')
                 
 
                 sections_to_add = {'KEYPATH':['keypath'] ,  'DEBUG' : ['show-log']}
@@ -200,25 +206,28 @@ def __main():
                         __config.set(section , setting , str.lower(preffered_setting))
 
                 __config.write(config_file)
-                print('New key-config.ini in root directory is made.')
+                print('New strenc-config.ini in root directory is made.')
 
             else:
-                print('key-config.ini already exists. To change config , run with --config [section/settings_to_change]')
+                print('strenc-config.ini already exists. To change config , run with --config [section/settings_to_change]')
         else:
             try:
-                config_file = open('key-config.ini' , 'r+')
-                __config.read('key-config.ini')
+                config_file = open('strenc-config.ini' , 'r+')
+                __config.read('strenc-config.ini')
                 config_section , config_settings = args.ConfigType.split('/')
+                if __config.has_option(config_section , config_settings):
+                    
 
-                preffered_setting = input(f'Change {config_settings} from {config_section} : ')
+                    preffered_setting = input(f'Change {config_settings} from {config_section} : ')    
+                    __config.set(config_section , config_settings , preffered_setting)
 
-                __config.set(config_section , config_settings , preffered_setting)
-
-                __config.write(config_file)
-                print(f'Settings {config_settings} from {config_section} is updated to {preffered_setting}') 
+                    __config.write(config_file)
+                    print(f'Settings {config_settings} from {config_section} is updated to {preffered_setting}')
+                else:
+                    print('Either the section or option does not exist')     
             except Exception as err:
                 __err_logging(DEBUG, __logging , err)
-                print('key-config.ini does not exists. run -config setup to generate a new one.Or the specific setting does not exists')    
+                print('strenc-config.ini does not exists. run -config setup to generate a new one.Or the specific setting does not exists')    
     
     if args.GenKeyType and not type_with_genkeys:
         print('Run -genkeystype alongside -genkeys')        

@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="strenc" ,
-    version="0.2.3" ,
+    version="0.2.4" ,
     description="A simple fully customizable string encoder and decoder" ,
     url="https://github.com/sdcard2008/strenc" ,  #will add later 
     author="Saptak De" ,
@@ -14,7 +14,7 @@ setup(
     ] ,
 
     include_package_data=True ,
-    entry_points={'console_scripts' : ['customizekeys = _customizekeys:__main']},
+    entry_points={'console_scripts' : ['strenc = _customizekeys:__main']},
 
     long_description=
     """

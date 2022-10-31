@@ -1,4 +1,4 @@
-# STRENC : A String Encode/Decoder (Dev Branch)
+# STRENC : A String Encode/Decoder
 
 [![PyPI version](https://badge.fury.io/py/strenc.svg)](https://badge.fury.io/py/strenc) [![Downloads](https://pepy.tech/badge/strenc)](https://pepy.tech/project/strenc)
 

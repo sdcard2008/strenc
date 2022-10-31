@@ -1,5 +1,6 @@
-from setuptools import setup
-
+from setuptools import find_packages, setup
+from os.path import abspath, dirname, join
+README_MD = open(join(dirname(abspath(__file__)), "README.md")).read()
 setup(
     name="strenc" ,
     version="0.2.4" ,
@@ -7,7 +8,7 @@ setup(
     url="https://github.com/sdcard2008/strenc" ,  #will add later 
     author="Saptak De" ,
     author_email="saptak1234hehe@gmail.com" ,
-    packages=["strenc" , "_customizekeys"] ,
+    packages=find_packages(exclude='tests') ,
     package_requires=[
         'strenc' ,
         '_customizekeys'
@@ -16,13 +17,8 @@ setup(
     include_package_data=True ,
     entry_points={'console_scripts' : ['strenc = _customizekeys:__main']},
 
-    long_description=
-    """
-    Simple String Encoder And Decoder , hence the name : str(string)enc(encoder). 
-    Keys are customizable using the 'customizekeys'.
+    long_description=README_MD ,
+    long_description_content_type="text/markdown"
 
-    Github Repo : https://github.com/sdcard2008/strenc
-     
-    """
 )
 

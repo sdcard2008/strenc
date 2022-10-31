@@ -1,4 +1,4 @@
-#DO NOT TOUCH
+
 #PROGRAM TO RUN COMMAND "customizekeys"
 
 #imports
@@ -34,21 +34,22 @@ def __main():
         {'com' : '-k' , 'val' : '--Key' , 'help' : 'Get key of a specific char'} ,
         {'com' : '-copy' , 'val' : '--Copy' , 'help' : 'Get a copy of the keys'} ,
         {'com' : '-change' , 'val' : '--Type' , 'help' : 'Either change the whole key file or change a specific char'},
-        {'com' : '-genkeys' , 'val' : '--Path' , 'help' : 'Create a keys.json file in root directory'} ,
-        {'com' : '-keypath' , 'val' : '--KeyPath' , 'help' : 'Loaction of keys.json' } ,
+        {'com' : '-genpath' , 'val' : '--Path' , 'help' : 'Create a keys.json file in root directory'} ,
+        {'com' : '-path' , 'val' : '--KeyPath' , 'help' : 'Loaction of keys.json' } ,
         {'com' : '-version' , 'val' : '--ShowOrNot' , 'help' : 'Outputs installed version of strenc'} ,
         {'com' : '-config' , 'val' : '--ConfigType' , 'help' : 'Setup or update config(Please run this command at the same folder as keys.json)' } ,
-        {'com' : '-genkeystype' , 'val' : '--GenKeyType' , 'help' : 'Key generator options. Wont work if -genkeys not given'}
+        {'com' : '-type' , 'val' : '--GenKeyType' , 'help' : 'Key generator options. Wont work if -genpath not given'} ,
+        {'com' : '-encfile' , 'val' : '--EncodeFile' , 'help' : 'Encode a txt file'}
 
     ]
     # add all the commands to the parser
     for command in SYSTEM_ARGS:
         parser.add_argument(command['com'] , command['val'] , help =command['help'])
 
-    args = parser.parse_args() # initialize args getter
+    args = parser.parse_args() # initialize args fetcher
  
     
-    DEBUG = 'false' # for log showing
+    DEBUG = 'false' # to show logs
     
     
     # get config and do stuff accordingly
@@ -68,7 +69,7 @@ def __main():
                         
     
     else:
-        print('-keypath [key_path] is absent and strenc-config.ini is absent. -k , -copy , -change will not work') 
+        print('-path [key_path] is absent and strenc-config.ini is absent. -k , -copy , -change will not work') 
               
     # initialize a logger if DEBUG is set to true
     if DEBUG == 'true':
@@ -99,7 +100,7 @@ def __main():
                     enc_keys[enc_key_keys] = replace_with
             except Exception as err:
                 __err_logging(DEBUG, __logging , err)
-                print('-change did not work. Either -keypath is wrong or it is absent.')    
+                print('-change did not work. Either -path is wrong or it is absent.')    
         else:
             
             try:
@@ -111,7 +112,7 @@ def __main():
                     print('Either input "all" or a specific character after -change')    
             except Exception as err:
                 __err_logging(DEBUG, __logging , err)
-                print('-change did not work. Either -keypath is wrong or it is absent.')    
+                print('-change did not work. Either -path is wrong or it is absent.')    
             
         print('Dumping data to json....')
         try:
@@ -126,10 +127,10 @@ def __main():
     # get value of a key
     if args.Key:
         try:
-            print(f'Key for {repr(args.Key)} is : {enc_keys[args.Key]}')
+            print(f'Key for {repr(args.Key)} is : {repr(enc_keys[args.Key])}')
         except Exception as err:
             __err_logging(DEBUG, __logging , err)
-            print('-k did not work. Either -keypath is wrong or it is absent. Or the character does not exist in the keys.json file')    
+            print('-k did not work. Either -path is wrong or it is absent. Or the character does not exist in the keys.json file')    
     # get a copy of current keys.json file
     if args.Copy:
         if args.Copy == 'true':
@@ -137,7 +138,7 @@ def __main():
                 print(enc_keys)
             except Exception as err:
                 __err_logging(DEBUG, __logging , err)
-                print('-copy did not work. Either -keypath is wrong or it is absent.')    
+                print('-copy did not work. Either -path is wrong or it is absent.')    
         else:
             print('Please type "true" after -copy')
          
@@ -168,7 +169,7 @@ def __main():
 
                         default_keys[letter] = random_char
                 else:
-                    print('Either enter "manual" or "random" after -genkeystype. This will result in a empty "keys.json" file')        
+                    print('Either enter "manual" or "random" after -type. This will result in a empty "keys.json" file')        
                 __json.dump(default_keys , new_key_file , indent=4)
         
                 print(f'Created new keys.json file in {args.Path}')
@@ -178,7 +179,7 @@ def __main():
                 __err_logging(DEBUG, __logging , err)
                 print('keys.json already exists')
         else:
-            print('Please add -genkeystype [manual/random] after -genkeys')    
+            print('Please add -type [manual/random] after -genpath')    
     # show current version of strenc    
     if args.ShowOrNot:
         if args.ShowOrNot == 'show':
@@ -230,6 +231,6 @@ def __main():
                 print('strenc-config.ini does not exists. run -config setup to generate a new one.Or the specific setting does not exists')    
     
     if args.GenKeyType and not type_with_genkeys:
-        print('Run -genkeystype alongside -genkeys')        
+        print('Run -type alongside -genpath')        
 
 

@@ -37,14 +37,14 @@ pip install strenc
 
 
 
-### customizekeys.exe (command line tool)
+### customizekeys (command line tool)
 
->From v0.2.4 , the command line tool is renamed from ```customizekeys``` to ```strenc``` 
+>### **From v0.2.4 , the command line tool is renamed from ```customizekeys``` to ```strenc```**
 
 - To generate a keys.json file run this command:
-    ```customizekeys -genkeys [where_you_want_to_put_keys] -genkeystype [manual/random]```
-    > ```-genkeystype [manual/random]``` is available from v0.1.4 . 
-    for ```-genkeystype``` , put either manual or random as your option. If manual , then you get to manually choose the keys for every character , else if random is choosen , you get a random key. 
+    ```customizekeys -genpath [where_you_want_to_put_keys] -type [manual/random]```
+    > ```-type [manual/random]``` is available from v0.1.4 . 
+    for ```-type``` , put either manual or random as your option. If manual , then you get to manually choose the keys for every character , else if random is choosen , you get a random key. 
 
 
 put your desired path instead of ```[where_you_want_to_put_keys]```
@@ -56,7 +56,7 @@ sample-py
 ```
 
 so if we want to make a keys.json file there , we have to do:
-```customizekeys -genkeys ./ -genkeys[your_type]```
+```customizekeys -genpath ./ -genpath[your_type]```
 
 
 

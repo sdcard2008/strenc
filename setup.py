@@ -9,11 +9,7 @@ setup(
     author="Saptak De" ,
     author_email="saptak1234hehe@gmail.com" ,
     packages=find_packages(exclude='tests') ,
-    package_requires=[
-        'strenc' ,
-        '_customizekeys'
-    ] ,
-
+    
     include_package_data=True ,
     entry_points={'console_scripts' : ['strenc = _customizekeys:__main']},
 

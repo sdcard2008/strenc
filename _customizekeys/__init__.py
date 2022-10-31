@@ -8,7 +8,7 @@ import configparser as __configparser
 from os.path import exists as __exists
 from os import makedirs as __makedirs
 from os import remove as __remove
-from os.path import splitext as __splitext 
+from os.path import basename as __basename  
 from random import choice as __choice 
 import string as _string
 import logging as __logging
@@ -40,7 +40,8 @@ def __main():
         {'com' : '-version' , 'val' : '--ShowOrNot' , 'help' : 'Outputs installed version of strenc'} ,
         {'com' : '-config' , 'val' : '--ConfigType' , 'help' : 'Setup or update config(Please run this command at the same folder as keys.json)' } ,
         {'com' : '-type' , 'val' : '--GenKeyType' , 'help' : 'Key generator options. Wont work if -genpath not given'} ,
-        {'com' : '-encfile' , 'val' : '--EncodeFile' , 'help' : 'Encode a txt file'}
+        {'com' : '-encfile' , 'val' : '--EncodeFile' , 'help' : 'Encode a txt file'} ,
+        {'com' : '-decfile' , 'val' : '--DecodeFile' , 'help' : 'Decode a encoded txt file'}
 
     ]
     # add all the commands to the parser
@@ -233,6 +234,7 @@ def __main():
     
     if args.GenKeyType and not type_with_genkeys:
         print('Run -type alongside -genpath')
+    # file encoding
     if args.EncodeFile:
         if __exists(args.EncodeFile):
             file_to_encode = open(args.EncodeFile , "r")
@@ -257,7 +259,7 @@ def __main():
                         content_of_file[i] = "".join(list_form)
                 #make a new file and append encoded content in it
                 
-                encoded_file = open(f'{__splitext(args.EncodeFile)[0]}-encoded.txt' , 'w') 
+                encoded_file = open(f'{__basename(args.EncodeFile).split(".")[0]}-encoded.txt' , 'w') 
 
                 encoded_file.writelines(content_of_file)                   
             except Exception as err:
@@ -267,6 +269,43 @@ def __main():
 
         else:
             print(f"File {args.EncodeFile} does not exist.")    
+    #file decoding
+    #almost same as file encoding
+    if args.DecodeFile:
+        if __exists(args.DecodeFile):
+            file_to_decode = open(args.DecodeFile , "r")
+            # gets all the line of the file
+            content_of_file_dec = file_to_decode.readlines()
+            #gets rid of all '\n' occurances
+            for index , line in enumerate(content_of_file_dec):
+                if '\n' in line:
+                    content_of_file_dec[index] = line.replace('\n' , '')
+            # try to encode each line one by one.
+            try:
+                for i , line_to_change in enumerate(content_of_file_dec):
+                    # change string to list for manipulation
+                    list_form_dec = list(line_to_change)
+                    #encode every character of the above list
+                    for another_index , char in enumerate(list_form_dec):
+                        list_form_dec[another_index] = _get_key_from_value(enc_keys , char)
+                    #replace original string with encoded one
+                    if i < len(content_of_file_dec)-1:
+                        content_of_file_dec[i] = "".join(list_form_dec)+'\n'
+                    else:
+                        content_of_file_dec[i] = "".join(list_form_dec)
+                #make a new file and append encoded content in it
+                
+                decoded_file = open(f'{__basename(args.DecodeFile).split(".")[0]}-decoded.txt' , 'w') 
 
+                decoded_file.writelines(content_of_file_dec)                   
+            except Exception as err:
+                __err_logging(DEBUG, __logging , err)
+                print('-decfile failed. Either keys.json is missing or not given')
+def _get_key_from_value(actual_dict  , val):
+    for key,value in actual_dict.items():
+        if val == value:
+            return key
+    return False    
+    
 
 

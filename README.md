@@ -75,9 +75,16 @@ if value is all , then it will prompt you for every single chararcter. Else , it
 - To get the char that will replace a specific character , just add ```-k [specific_char]``` to your command , where ```[specific_char]``` is the character you are searching for.
 - From *v0.1.2* , you can make a config file using ```customizekeys -config [setup/specific_settings]```. You can set the key_path in the file so you don't have to put ```-keypath [path_to_your_keys]``` all the time. And to change a specific settings from specific section , just do ```-config [SECTION]/[settings]``` 
 
+# v0.2.5
+
+- Added command ```strenc -encfile [filepath]```. As the name suggests , it encodes any given .txt file. Path to keys.json should be given.
+- Added command ```strenc -decfile [filepath]```. This command decodes a encoded file. Also needs path to keys.json file.
+
 > From *v0.2.2* , there is a new config option called 'show-log' under DEBUG section. If 'show-log' is set to true , then it will log errors at the same directory as the command was ran in a file called 'customizekeys.log'. By default DEBUG  is set to false
 
 - From *v0.1.3* , you can check current version of strenc by running ```customizekeys -version show```
+
+
 ### STRENC module documentation
 > *From ```v0.1.4``` , the methods are stored in a class called ```Strenc```*
 

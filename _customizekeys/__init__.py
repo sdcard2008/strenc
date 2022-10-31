@@ -8,6 +8,7 @@ import configparser as __configparser
 from os.path import exists as __exists
 from os import makedirs as __makedirs
 from os import remove as __remove
+from os.path import splitext as __splitext 
 from random import choice as __choice 
 import string as _string
 import logging as __logging
@@ -69,7 +70,7 @@ def __main():
                         
     
     else:
-        print('-path [key_path] is absent and strenc-config.ini is absent. -k , -copy , -change will not work') 
+        print('-path [key_path] is absent and strenc-config.ini is absent. -k , -copy , -change , -encfile will not work') 
               
     # initialize a logger if DEBUG is set to true
     if DEBUG == 'true':
@@ -81,7 +82,7 @@ def __main():
         enc_keys = __json.load(file_json)
         letters_for_keys = enc_keys.keys()
     except:
-        print('Cannot find keys.json from given path. -k , -copy , -change will not work.')
+        print('Cannot find keys.json from given path. -k , -copy , -change , -encfile will not work.')
 
 
     type_with_genkeys = False
@@ -231,6 +232,41 @@ def __main():
                 print('strenc-config.ini does not exists. run -config setup to generate a new one.Or the specific setting does not exists')    
     
     if args.GenKeyType and not type_with_genkeys:
-        print('Run -type alongside -genpath')        
+        print('Run -type alongside -genpath')
+    if args.EncodeFile:
+        if __exists(args.EncodeFile):
+            file_to_encode = open(args.EncodeFile , "r")
+            # gets all the line of the file
+            content_of_file = file_to_encode.readlines()
+            #gets rid of all '\n' occurances
+            for index , line in enumerate(content_of_file):
+                if '\n' in line:
+                    content_of_file[index] = line.replace('\n' , '')
+            # try to encode each line one by one.
+            try:
+                for i , line_to_change in enumerate(content_of_file):
+                    # change string to list for manipulation
+                    list_form = list(line_to_change)
+                    #encode every character of the above list
+                    for another_index , char in enumerate(list_form):
+                        list_form[another_index] = enc_keys[char]
+                    #replace original string with encoded one
+                    if i < len(content_of_file)-1:
+                        content_of_file[i] = "".join(list_form)+'\n'
+                    else:
+                        content_of_file[i] = "".join(list_form)
+                #make a new file and append encoded content in it
+                
+                encoded_file = open(f'{__splitext(args.EncodeFile)[0]}-encoded.txt' , 'w') 
+
+                encoded_file.writelines(content_of_file)                   
+            except Exception as err:
+                __err_logging(DEBUG, __logging , err)
+                print('-encfile failed. Either keys.json is missing or not given')            
+
+
+        else:
+            print(f"File {args.EncodeFile} does not exist.")    
+
 
 

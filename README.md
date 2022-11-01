@@ -105,47 +105,52 @@ Constructor of the new ```Strenc``` class. ```key_path``` is an optional argueme
  ```
  Used to load the keys.json file. ```path``` should be a string. Sets ```Keys``` variable from class Strenc to a dictionary.
 
- ```strenc.encode(self , msg : str , would_be_decoded_by_human : bool , keys : dict) ```
+ ```strenc.encode(self , msg : str , human_readable : bool , keys : dict) ```
 
  ```python
- def encode(self , msg:str , will_be_decoded_later_by_human : bool = False , keys : dict = None):
+ def encode(self  , msg:str , human_readable : bool = False , keys : dict = None , folds=1):
     if keys is None:
         keys = self.Keys
     try:
-        msg_letters = list(msg)
+        for fold in range(folds):
+            msg_letters = list(msg)
 
-        for letter_index ,letter in enumerate(msg_letters):
-            msg_letters[letter_index] = keys[letter]
-        if will_be_decoded_later_by_human:
-            return repr("".join(msg_letters))
-        return "".join(msg_letters)         
-    except:
-        return False
+            for letter_index ,letter in enumerate(msg_letters):
+                msg_letters[letter_index] = keys[letter]
+            msg = "".join(map(str,msg_letters))        
+        if human_readable:
+            return repr(msg)
+        return msg    
+    except Exception as e:
+        print(e)
  ```
- Takes a dictionary with keys  , which can be either stored in a variable using ```strenc.return_keys(self , path : str)``` , or can be loaded using ```strenc.load_keys(self , path : str)```(preferably loaded with ```strenc.load_keys(path:str)```) , the message to encode , and an optional arguement if it would be manually put in a function (By default it's False).
+ Takes a dictionary with keys  , which can be either stored in a variable using ```strenc.return_keys(self , path : str)``` , or can be loaded using ```strenc.load_keys(self , path : str)```(preferably loaded with ```strenc.load_keys(path:str)```) , the message to encode , an optional arguement to output the encoded string with special characters (By default it's False) , and a ```folds``` arguement deciding how many times the message would be encoded (By default it is 1).
  Returns the encoded message using the keys.
 
- ```strenc.decode(self , keys : dict , msg : str , would_be_encoded_by_human : bool)```
+ ```def decode(self  , msg:str , human_readable : bool = False ,  keys : dict = None , folds=1)```
 
  ```python
- def decode(self  , msg:str , will_be_encoded_later_by_humans : bool = False ,  keys : dict = None):
+ def decode(self  , msg:str , human_readable : bool = False ,  keys : dict = None , folds=1) :
+        
     if keys is None:
         keys = self.Keys
-    try:
-        msg_letters = list(msg)
+    try:    
+        for dec_fold in range(folds):
+                
+            msg_letters = list(msg)
 
-        for letter_index ,letter in enumerate(msg_letters):
-            msg_letters[letter_index] = _get_key_from_value(keys , letter)
-        if will_be_encoded_later_by_humans:
-            return repr("".join(msg_letters))
-        return "".join(msg_letters)
+            for letter_index ,letter in enumerate(msg_letters):
+                msg_letters[letter_index] = _get_key_from_value(keys , letter)
+            msg = "".join(map(str ,msg_letters))    
+        if human_readable:
+            return repr(msg)
+        return msg
 
-
-    except:
-        return False 
-
+    except Exception as e:
+        print(e)
  ```
- Arguements same as ```strenc.encode(self , msg : str , would_be_decoded_by_human : bool , keys : dict)```. Returns the decoded message from a encoded message. ```_get_key_from_value(keys : dict , char:str)``` is a function to get key from value.
+ Arguements same as ```strenc.encode(self , msg : str , human_readable : bool , keys : dict)```. Returns the decoded message from a encoded message. ```_get_key_from_value(keys : dict , char:str)``` is a function to get key from value.
+ >The ```folds``` arguement should be the same as the ```folds``` arguement used during the encoding process
 
 ```strenc.return_keys(self , path : dict)```
 

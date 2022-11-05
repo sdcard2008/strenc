@@ -63,7 +63,7 @@ so if we want to make a keys.json file there , we have to do:
 
 
 >*P.S : before v0.1.3 , it cannot make folders if not found. So make the folders , then run the command.*    
-- To do anything besides make a new keys.json file , you have to add the arguement ```-keypath [path_to_your_keys]```
+- To do any key file manipulation , besides to make a new keys.json file , you have to add the arguement ```-keypath [path_to_your_keys]```
 where , ```[path_to_your_keys]``` is where your keys.json file is located.
 for example , lets say path to the key is ```./path/to/key/keys.json```
 then to fetch the keys , you run:

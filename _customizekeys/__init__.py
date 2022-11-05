@@ -95,10 +95,24 @@ def __main():
     # replace a certain key
     if args.Type:
         if args.Type == 'all':    
+            used_replacement = []
             try:
+                
                 for enc_key_keys in letters_for_keys:
-                    replace_with = input(f'Replace {repr(enc_key_keys)} with :')
+                    
+                    while True:
+                        replace_with = input(f'Replace {repr(enc_key_keys)} with :')
 
+                        if replace_with in used_replacement:
+                            print('This character has already been assigned to a key. Use another...')
+                            continue
+                        elif len(replace_with) != 1:
+                            print('Input length is not equal to 1. Use another...')
+                            continue    
+                        else:
+                            break
+                            
+                    used_replacement.append(replace_with)        
                     enc_keys[enc_key_keys] = replace_with
             except Exception as err:
                 __err_logging(DEBUG, __logging , err)
@@ -107,8 +121,17 @@ def __main():
             
             try:
                 if args.Type in letters_for_keys:    
-                    replace_with = input(f'Replace {repr(args.Type)} with :')
-
+                    while True:
+                        replace_with = input(f'Replace {repr(args.Type)} with :')
+                        if enc_keys[args.Type] == replace_with:
+                            print(f'Key {args.Type} already has the value {replace_with}')
+                            continue
+                        elif len(replace_with) != 1:
+                            print('Input length is not equal to 1. Use another...')
+                            continue                        
+                        else:
+                            break
+                            
                     enc_keys[args.Type] = replace_with
                 else:
                     print('Either input "all" or a specific character after -change')    
@@ -157,9 +180,20 @@ def __main():
                 ALPHABETS = _string.printable
                 default_keys = {}
                 if args.GenKeyType == 'manual':    
+                    used_assignments = []
                     for letter in ALPHABETS:
-                        character_key = input(f'Replace {repr(letter)} with : ')
-
+                        while True:
+                            character_key = input(f'Value of key {repr(letter)} should be : ')
+                            if character_key in used_assignments:
+                                print(f'Character {character_key} already assigned. Use another...')
+                                continue
+                            elif len(character_key) != 1:
+                                print('Input length is not equal to 1. Use another...')
+                                continue
+                            else:
+                                break
+                                
+                        used_assignments.append(character_key)
                         default_keys[letter] = character_key
                 elif args.GenKeyType == 'random':
                     ALPHABETS_LIST = list(ALPHABETS)

@@ -38,35 +38,37 @@ class Strenc:
                
 
     @classmethod
-    def encode(self  , msg:str , will_be_decoded_later_by_human : bool = False , keys : dict = None , out_only_msg = True):
+    def encode(self  , msg:str , human_readable : bool = False , keys : dict = None , folds=1):
         if keys is None:
             keys = self.Keys
         try:
-            
-            msg_letters = list(msg)
+            for fold in range(folds):
+                msg_letters = list(msg)
 
-            for letter_index ,letter in enumerate(msg_letters):
-                msg_letters[letter_index] = keys[letter]
-            msg = "".join(msg_letters)        
-            if will_be_decoded_later_by_human:
+                for letter_index ,letter in enumerate(msg_letters):
+                    msg_letters[letter_index] = keys[letter]
+                msg = "".join(map(str,msg_letters))        
+            if human_readable:
                 return repr(msg)
             return msg    
         except Exception as e:
             print(e)
             
     @classmethod
-    def decode(self  , msg:str , will_be_encoded_later_by_humans : bool = False ,  keys : dict = None):
+    def decode(self  , msg:str , human_readable : bool = False ,  keys : dict = None , folds=1) :
         
         
         if keys is None:
             keys = self.Keys
         try:    
-            msg_letters = list(msg)
+            for dec_fold in range(folds):
+                    
+                msg_letters = list(msg)
 
-            for letter_index ,letter in enumerate(msg_letters):
-                msg_letters[letter_index] = _get_key_from_value(keys , letter)
-            msg = "".join(msg_letters)    
-            if will_be_encoded_later_by_humans:
+                for letter_index ,letter in enumerate(msg_letters):
+                    msg_letters[letter_index] = _get_key_from_value(keys , letter)
+                msg = "".join(map(str ,msg_letters))    
+            if human_readable:
                 return repr(msg)
             return msg
 

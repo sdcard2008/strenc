@@ -41,7 +41,8 @@ def __main():
         {'com' : '-config' , 'val' : '--ConfigType' , 'help' : 'Setup or update config(Please run this command at the same folder as keys.json)' } ,
         {'com' : '-type' , 'val' : '--GenKeyType' , 'help' : 'Key generator options. Wont work if -genpath not given'} ,
         {'com' : '-encfile' , 'val' : '--EncodeFile' , 'help' : 'Encode a txt file'} ,
-        {'com' : '-decfile' , 'val' : '--DecodeFile' , 'help' : 'Decode a encoded txt file'}
+        {'com' : '-decfile' , 'val' : '--DecodeFile' , 'help' : 'Decode a encoded txt file'},
+        {'com' : '-folds' , 'val' : '--Folds' , 'help' : 'Decide how many folds of encoding/decoding to use for file. Must be run with either -encfile or -decfile'}
 
     ]
     # add all the commands to the parser
@@ -87,6 +88,7 @@ def __main():
 
 
     type_with_genkeys = False
+    folds_with_file = False
 
      
 
@@ -270,22 +272,33 @@ def __main():
         print('Run -type alongside -genpath')
     # file encoding
     if args.EncodeFile:
+        folds_with_file = True
+        folds = 1
+        #get value of 'folds' if given
+        if args.Folds:
+            try:
+                folds = int(args.Folds)
+            except Exception as err:
+                __err_logging(DEBUG, __logging , err)
+                print('value of argument -folds should be a integer')
+
+
         if __exists(args.EncodeFile):
             file_to_encode = open(args.EncodeFile , "r")
             # gets all the line of the file
             content_of_file = file_to_encode.readlines()
-            #gets rid of all '\n' occurances
-            for index , line in enumerate(content_of_file):
-                if '\n' in line:
-                    content_of_file[index] = line.replace('\n' , '')
+            #gets rid of leading or trailing whitespace occurances at end of line
+            for index,line in enumerate(content_of_file):
+                content_of_file[index] = line.strip()
             # try to encode each line one by one.
             try:
                 for i , line_to_change in enumerate(content_of_file):
-                    # change string to list for manipulation
+                    # change string to list for easier manipulation
                     list_form = list(line_to_change)
-                    #encode every character of the above list
-                    for another_index , char in enumerate(list_form):
-                        list_form[another_index] = enc_keys[char]
+                    for folds in range(folds):    
+                        #encode every character of the above list
+                        for another_index , char in enumerate(list_form):
+                            list_form[another_index] = enc_keys[char]
                     #replace original string with encoded one
                     if i < len(content_of_file)-1:
                         content_of_file[i] = "".join(list_form)+'\n'
@@ -306,6 +319,15 @@ def __main():
     #file decoding
     #almost same as file encoding
     if args.DecodeFile:
+        folds_with_file = True
+        folds = 1
+        #get value of 'folds' if given
+        if args.Folds:
+            try:
+                folds = int(args.Folds)
+            except Exception as err:
+                __err_logging(DEBUG, __logging , err)
+                print('value of argument -folds should be a integer')
         if __exists(args.DecodeFile):
             file_to_decode = open(args.DecodeFile , "r")
             # gets all the line of the file
@@ -319,22 +341,26 @@ def __main():
                 for i , line_to_change in enumerate(content_of_file_dec):
                     # change string to list for manipulation
                     list_form_dec = list(line_to_change)
-                    #encode every character of the above list
-                    for another_index , char in enumerate(list_form_dec):
-                        list_form_dec[another_index] = _get_key_from_value(enc_keys , char)
+                    for dec_folds in range(folds):    
+                        #encode every character of the above list
+                        for another_index , char in enumerate(list_form_dec):
+                            list_form_dec[another_index] = _get_key_from_value(enc_keys , char)
                     #replace original string with encoded one
                     if i < len(content_of_file_dec)-1:
                         content_of_file_dec[i] = "".join(list_form_dec)+'\n'
                     else:
                         content_of_file_dec[i] = "".join(list_form_dec)
                 #make a new file and append encoded content in it
-                
-                decoded_file = open(f'{__basename(args.DecodeFile).split(".")[0]}-decoded.txt' , 'w') 
-
+                if "-encoded" not in args.DecodeFile: 
+                    decoded_file = open(f'{__basename(args.DecodeFile).split(".")[0]}-decoded.txt' , 'w') 
+                else:
+                    decoded_file = open(f'{__basename(args.DecodeFile).split(".")[0].replace("-encoded" , "")}-original.txt' , 'w') 
                 decoded_file.writelines(content_of_file_dec)                   
             except Exception as err:
                 __err_logging(DEBUG, __logging , err)
                 print('-decfile failed. Either keys.json is missing or not given')
+    if args.Folds and not folds_with_file:
+        print('Use argument -folds with either -encfile or -decfile')            
 def _get_key_from_value(actual_dict  , val):
     for key,value in actual_dict.items():
         if val == value:

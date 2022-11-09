@@ -3,7 +3,7 @@ from os.path import abspath, dirname, join
 README_MD = open(join(dirname(abspath(__file__)), "README.md")).read()
 setup(
     name="strenc" ,
-    version="0.2.6" ,
+    version="0.2.7" ,
     description="A simple fully customizable string encoder and decoder" ,
     url="https://github.com/sdcard2008/strenc" ,  #will add later 
     author="Saptak De" ,

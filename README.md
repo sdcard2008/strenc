@@ -80,7 +80,7 @@ if value is all , then it will prompt you for every single chararcter. Else , it
 - Added command ```strenc -encfile [filepath]```. As the name suggests , it encodes any given .txt file. Path to keys.json should be given.
 - Added command ```strenc -decfile [filepath]```. This command decodes a encoded file. Also needs path to keys.json file.
 
-# v0.2.6
+# v0.2.7
 
 - Added command ```strenc -encfile [filepath] -folds [integer]```. It works same as the folds system in the library. It also works with ```-decfile```.
  

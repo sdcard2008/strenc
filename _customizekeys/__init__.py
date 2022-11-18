@@ -387,7 +387,7 @@ def __main():
                     # change string to list for easier manipulation
                     list_form = list(line_to_change)
                     
-                    for folds in range(folds):
+                    for fold in range(folds):
 
                         #encode every character of the above list
                         for another_index, char in enumerate(list_form):

@@ -9,13 +9,16 @@ from os import makedirs as __makedirs
 from os import remove as __remove
 from os.path import basename as __basename
 from random import choice as __choice
-import string as _string
+import string as __string
 import logging as __logging
 
-__version__ = '0.2.4'
+
+
+__version__ = '0.2.7'
 __author__ = 'Saptak De'
 
 __config = __configparser.ConfigParser()  # to parse strenc-config.ini
+
 
 
 # err logging func
@@ -39,6 +42,7 @@ def remove_all(to_remove, list: list):
 
 
 def __main():
+    
     parser = __argparse.ArgumentParser()  # argument parser
 
     # all the commands for 'strenc'
@@ -98,7 +102,8 @@ def __main():
         '--Folds',
         'help':
         'Decide how many folds of encoding/decoding to use for file. Must be run with either -encfile or -decfile'
-    }]
+    }
+    ]
     # add all the commands to the parser
     for command in SYSTEM_ARGS:
         parser.add_argument(command['com'],
@@ -108,6 +113,7 @@ def __main():
     args = parser.parse_args()  # initialize args fetcher
 
     DEBUG = 'false'  # to show logs
+    
 
     # get config and do stuff accordingly
     if args.KeyPath:
@@ -125,6 +131,7 @@ def __main():
             DEBUG = __config.get('DEBUG', 'show-log')
         except:
             pass
+           
 
     else:
         print(
@@ -145,13 +152,15 @@ def __main():
     except:
         print(
             'Cannot find keys.json from given path. -k , -copy , -change , -encfile will not work.'
-        )
+        )          
 
     type_with_genkeys = False
     folds_with_file = False
+    
 
     # replace a certain key
-    if args.Type:
+    if args.Type:    
+        
         if args.Type == 'all':
             used_replacement = []
             try:
@@ -223,6 +232,7 @@ def __main():
         except Exception as err:
             __err_logging(DEBUG, __logging, err)
             print('Dumping data to keys.json failed')
+           
     # get value of a key
     if args.Key:
         try:
@@ -254,7 +264,7 @@ def __main():
                 if not __exists(args.Path):
                     __makedirs(args.Path)
                 new_key_file = open(f'{args.Path}/keys.json', 'x')
-                ALPHABETS = _string.printable
+                ALPHABETS = __string.printable
                 default_keys = {}
                 if args.GenKeyType == 'manual':
                     used_assignments = []
@@ -289,7 +299,7 @@ def __main():
                 else:
                     print(
                         'Either enter "manual" or "random" after -type. This will result in a empty "keys.json" file'
-                    )
+                    )       
                 __json.dump(default_keys, new_key_file, indent=4)
 
                 print(f'Created new keys.json file in {args.Path}')

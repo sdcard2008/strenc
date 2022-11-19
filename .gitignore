@@ -4,5 +4,4 @@ __pycache__/
 dist
 TODO.*
 tests/
-*/requirements.txt
 .vscode

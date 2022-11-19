@@ -1,6 +1,13 @@
 from setuptools import find_packages, setup
 from os.path import abspath, dirname, join
+import os
 README_MD = open(join(dirname(abspath(__file__)), "README.md")).read()
+lib_folder = os.path.dirname(os.path.realpath(__file__))
+requirement_path = lib_folder + '/requirements.txt'
+install_requires = [] # Here we'll get: ["gunicorn", "docutils>=0.3", "lxml==0.5a7"]
+if os.path.isfile(requirement_path):
+    with open(requirement_path) as f:
+        install_requires = f.read().splitlines()
 setup(
     name="strenc" ,
     version="0.2.7" ,
@@ -14,7 +21,8 @@ setup(
     entry_points={'console_scripts' : ['strenc = _customizekeys:__main']},
 
     long_description=README_MD ,
-    long_description_content_type="text/markdown"
+    long_description_content_type="text/markdown",
+    install_requires=install_requires
 
 )
 

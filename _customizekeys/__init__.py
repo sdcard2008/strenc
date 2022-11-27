@@ -11,6 +11,7 @@ from os.path import basename as __basename
 from random import choice as __choice
 import string as __string
 import logging as __logging
+from logging import Logger 
 
 
 
@@ -19,20 +20,20 @@ __author__ = 'Saptak De'
 
 __config = __configparser.ConfigParser()  # to parse strenc-config.ini
 
-
+logger_handle = "strenc_logger"
 
 # err logging func
-def __err_logging(debug: bool, logger, err: Exception):
+def __err_logging(debug: bool, logger : Logger, err: Exception):
     if debug == 'true':
-        logger.exception(err)
+        logger.exception(f"[ERROR] : {err}")
         return True
     return False
 
 
 # used for debugging
-def __debug_log(debug, logger, info):
+def __debug_log(debug : bool, logger : Logger, info : str):
     if debug == 'true':
-        logger.debug(info)
+        logger.debug(f"[DEBUG] : {info}")
         return True
     return False
 
@@ -142,9 +143,11 @@ def __main():
     if DEBUG == 'true':
         __logging.basicConfig(filename='strenc.log',
                               filemode='w',
-                              format='%(asctime)s - %(message)s')
+                              format='%(asctime)s - %(message)s',
+                              level=__logging.NOTSET)
     elif __exists('strenc.log') and DEBUG == 'false':
         __remove('strenc.log')
+    logger = __logging.getLogger(logger_handle)    
     try:
         file_json = open(f'{path_to_keys}/keys.json', 'r+')
         enc_keys = __json.load(file_json)
@@ -170,11 +173,13 @@ def __main():
                     while True:
                         replace_with = input(
                             f'Replace {repr(enc_key_keys)} with :')
+                        
 
                         if replace_with in used_replacement:
                             print(
                                 'This character has already been assigned to a key. Use another...'
                             )
+                            
                             continue
                         elif len(replace_with) != 1:
                             print(
@@ -187,7 +192,7 @@ def __main():
                     used_replacement.append(replace_with)
                     enc_keys[enc_key_keys] = replace_with
             except Exception as err:
-                __err_logging(DEBUG, __logging, err)
+                __err_logging(DEBUG, logger, err)
                 print(
                     '-change did not work. Either -path is wrong or it is absent.'
                 )
@@ -198,6 +203,7 @@ def __main():
                     while True:
                         replace_with = input(
                             f'Replace {repr(args.Type)} with :')
+                        
                         if enc_keys[args.Type] == replace_with:
                             print(
                                 f'Key {args.Type} already has the value {replace_with}'
@@ -212,12 +218,13 @@ def __main():
                             break
 
                     enc_keys[args.Type] = replace_with
+                    __debug_log(DEBUG , logger , f"Replaced {args.Type} with {replace_with}")
                 else:
                     print(
                         'Either input "all" or a specific character after -change'
                     )
             except Exception as err:
-                __err_logging(DEBUG, __logging, err)
+                __err_logging(DEBUG, logger, err)
                 print(
                     '-change did not work. Either -path is wrong or it is absent.'
                 )
@@ -230,7 +237,7 @@ def __main():
             __json.dump(enc_keys, file_json, indent=4)
             print('keys.json is updated')
         except Exception as err:
-            __err_logging(DEBUG, __logging, err)
+            __err_logging(DEBUG, logger, err)
             print('Dumping data to keys.json failed')
            
     # get value of a key
@@ -238,7 +245,7 @@ def __main():
         try:
             print(f'Key for {repr(args.Key)} is : {repr(enc_keys[args.Key])}')
         except Exception as err:
-            __err_logging(DEBUG, __logging, err)
+            __err_logging(DEBUG, logger, err)
             print(
                 '-k did not work. Either -path is wrong or it is absent. Or the character does not exist in the keys.json file'
             )
@@ -248,7 +255,7 @@ def __main():
             try:
                 print(enc_keys)
             except Exception as err:
-                __err_logging(DEBUG, __logging, err)
+                __err_logging(DEBUG, logger, err)
                 print(
                     '-copy did not work. Either -path is wrong or it is absent.'
                 )
@@ -305,7 +312,7 @@ def __main():
                 print(f'Created new keys.json file in {args.Path}')
 
             except Exception as err:
-                __err_logging(DEBUG, __logging, err)
+                __err_logging(DEBUG, logger, err)
                 print('keys.json already exists')
         else:
             print('Please add -type [manual/random] after -genpath')
@@ -364,7 +371,7 @@ def __main():
                 else:
                     print('Either the section or option does not exist')
             except Exception as err:
-                __err_logging(DEBUG, __logging, err)
+                __err_logging(DEBUG, logger, err)
                 print(
                     'strenc-config.ini does not exists. run -config setup to generate a new one.Or the specific setting does not exists'
                 )
@@ -380,7 +387,7 @@ def __main():
             try:
                 folds = int(args.Folds)
             except Exception as err:
-                __err_logging(DEBUG, __logging, err)
+                __err_logging(DEBUG, logger, err)
                 print('value of argument -folds should be a integer')
 
         if __exists(args.EncodeFile):
@@ -415,7 +422,7 @@ def __main():
 
                 encoded_file.writelines(content_of_file)
             except Exception as err:
-                __err_logging(DEBUG, __logging, err)
+                __err_logging(DEBUG, logger, err)
                 print(
                     '-encfile failed. Either keys.json is missing or not given'
                 )
@@ -432,7 +439,7 @@ def __main():
             try:
                 folds = int(args.Folds)
             except Exception as err:
-                __err_logging(DEBUG, __logging, err)
+                __err_logging(DEBUG, logger, err)
                 print('value of argument -folds should be a integer')
         if __exists(args.DecodeFile):
             file_to_decode = open(args.DecodeFile, "r")
@@ -470,7 +477,7 @@ def __main():
                         'w')
                 decoded_file.writelines(content_of_file_dec)
             except Exception as err:
-                __err_logging(DEBUG, __logging, err)
+                __err_logging(DEBUG, logger, err)
                 print(
                     '-decfile failed. Either keys.json is missing or not given'
                 )

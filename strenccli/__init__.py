@@ -13,8 +13,10 @@ def __main():
     strenc_cli = StrencCLI ("0.2.8" , configparser , argparse , logging)
     
     # calling init functions
-    strenc_cli.init_conf(default_conf)
+    
     strenc_cli.init_args()
+    strenc_cli.init_conf(default_conf)
+    strenc_cli.init_key()
     strenc_cli.init_logger()
     
     
@@ -32,7 +34,7 @@ def __main():
         "folds" : strenc_cli.args.folds
     }
     
-    strenc_cli.init_key()
+    
     
 
     if (ARGUMENT_VARS["change"]):

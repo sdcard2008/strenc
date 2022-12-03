@@ -24,6 +24,7 @@ class StrencCLI:
     
     
     DEBUG = 'false'
+    path_to_keys = None
     
     # all commands and arguments
     SYSTEM_ARGS = [{
@@ -161,11 +162,14 @@ class StrencCLI:
     
     def init_key(self):
         try:
+            if self.path_to_keys is not None:
                 self.file_json = open(f'{self.path_to_keys}/keys.json', 'r+')
                 self.key_dict = json.load(self.file_json)
                 self.keys_of_dict = self.key_dict.keys()
+            else:
+                print("No keys.json found or path not given")    
         except Exception as err:
-                self.err_logging("Error while initializing keys", err)
+                print("Error while initializing keys\n", err)
 
     # change key
     

@@ -482,7 +482,7 @@ class StrencCLI:
     
     def decode_file(self , decfile_arg , arg_folds):
         if decfile_arg:
-            folds_with_file = True
+            self.folds_with_file = True
             folds = 1
             #get value of 'folds' if given
             if arg_folds:

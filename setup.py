@@ -15,7 +15,7 @@ setup(
     url="https://github.com/sdcard2008/strenc" ,  #will add later 
     author="Saptak De" ,
     author_email="saptak1234hehe@gmail.com" ,
-    packages=find_packages(exclude=['tests']) ,
+    packages=find_packages(exclude=['strenccli' , 'tests']) ,
     
     include_package_data=True ,
     entry_points={'console_scripts' : ['strenc = strenccli:__main']},

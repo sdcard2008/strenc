@@ -5,7 +5,7 @@ import json as _json
 A very simple , customizable , string encoder and decoder.        
 """
 
-__version__ = "0.2.7"
+__version__ = "0.2.8"
 __author__ = "Saptak De"
 
 

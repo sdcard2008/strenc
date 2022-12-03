@@ -86,7 +86,7 @@ if value is all , then it will prompt you for every single chararcter. Else , it
  
 > From *v0.2.2* , there is a new config option called 'show-log' under DEBUG section. If 'show-log' is set to true , then it will log errors at the same directory as the command was ran in a file called 'customizekeys.log'. By default DEBUG  is set to false
 
-- From *v0.1.3* , you can check current version of strenc by running ```customizekeys -version show```
+- From *v0.1.3* , you can check current version of strenc by running ```customizekeys -v show```
 
 
 ### STRENC module documentation

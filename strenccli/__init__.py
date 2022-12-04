@@ -5,12 +5,12 @@
 import argparse 
 import configparser 
 import logging
-from strenccli.main import StrencCLI
+from strenccli._main import StrencCLI
 
 
 def __main():
     default_conf = "strenconf.ini"
-    strenc_cli = StrencCLI ("0.2.8" , configparser , argparse , logging)
+    strenc_cli = StrencCLI ("0.2.9" , configparser , argparse , logging)
     
     # calling init functions
     

@@ -31,7 +31,8 @@ def __main():
         "genkeytype" : strenc_cli.args.genkeytype,
         "encfile" : strenc_cli.args.encodefile,
         "decfile" : strenc_cli.args.decodefile,
-        "folds" : strenc_cli.args.folds
+        "folds" : strenc_cli.args.folds,
+        "clen" : strenc_cli.args.chunklength
     }
     
     
@@ -45,7 +46,7 @@ def __main():
     elif (ARGUMENT_VARS["copy"]):
         strenc_cli.get_copy(ARGUMENT_VARS['copy'])
     elif (ARGUMENT_VARS["genpath"]):
-        strenc_cli.gen_keys(ARGUMENT_VARS["genpath"] , ARGUMENT_VARS["genkeytype"])
+        strenc_cli.gen_keys(ARGUMENT_VARS["genpath"] , ARGUMENT_VARS["genkeytype"] , ARGUMENT_VARS["clen"])
     elif (ARGUMENT_VARS["version"]):
         strenc_cli.show_version(ARGUMENT_VARS["version"])
     elif (ARGUMENT_VARS["config"]):

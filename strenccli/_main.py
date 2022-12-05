@@ -83,6 +83,13 @@ class StrencCLI:
         '-folds',
         'help':
         'Decide how many folds of encoding/decoding to use for file. Must be run with either -encfile or -decfile'
+    }, {
+        'com':
+        '-clen',
+        'val':
+        '--chunklength',
+        'help':
+        'Decides length of each key'            
     }]
     __author__ = 'Saptak De'
     
@@ -157,19 +164,22 @@ class StrencCLI:
     # gatekeep variables
     type_with_genkeys = False
     folds_with_file = False
+    clen_with_keygen = False
     
     # initialize key related variables
     
     def init_key(self):
         try:
-            if self.path_to_keys is not None:
+            if self.path_to_keys is not None and exists(f'{self.path_to_keys}/keys.json'):
                 self.file_json = open(f'{self.path_to_keys}/keys.json', 'r+')
+                
                 self.key_dict = json.load(self.file_json)
-                self.keys_of_dict = self.key_dict.keys()
+                self.keys_of_dict = self.key_dict["keys"].keys()
+                self.clen = self.key_dict["chunk-length"]
             else:
                 print("No keys.json found or path not given")    
         except Exception as err:
-                print("Error while initializing keys\n", err)
+                self.err_logging(err , "Error while initializing key")
 
     # change key
     
@@ -190,19 +200,19 @@ class StrencCLI:
                             )
 
                             continue
-                        elif len(replace_with) != 1:
+                        elif len(replace_with) != self.clen:
                             print(
-                                'Input length is not equal to 1. Use another...'
+                                f'Input length is not equal to {self.clen}. Use another...'
                             )
                             continue
                         else:
                             self.debug_log(
-                                f"Replaced {repr(key)} with {replace_with}"
+                                f"Replaced {repr(key)} with {repr(replace_with)}"
                             )
                             break
 
                     used_replacement.append(replace_with)
-                    self.key_dict[key] = replace_with
+                    self.key_dict["keys"][key] = replace_with
                 
                  
             except Exception as err:
@@ -219,23 +229,23 @@ class StrencCLI:
                         replace_with = input(
                             f'Replace {repr(arg_change)} with :')
 
-                        if self.key_dict[arg_change] == replace_with:
+                        if self.key_dict["keys"][arg_change] == replace_with:
                             print(
                                 f'Key {arg_change} already has the value {replace_with}'
                             )
                             continue
-                        elif len(replace_with) != 1:
+                        elif len(replace_with) != self.clen:
                             print(
-                                'Input length is not equal to 1. Use another...'
+                                f'Input length is not equal to {self.clen}. Use another...'
                             )
                             continue
                         else:
                             self.debug_log(
-                                f"Replaced {repr(arg_change)} with {replace_with}"
+                                f"Replaced {repr(arg_change)} with {repr(replace_with)}"
                             )
                             break
 
-                    self.key_dict[arg_change] = replace_with
+                    self.key_dict["keys"][arg_change] = replace_with
                     
                 else:
                     print(
@@ -263,7 +273,7 @@ class StrencCLI:
         
         try:
             print(
-                f'Key for {repr(arg_key)} is : {repr(self.key_dict[arg_key])}'
+                f'Key for {repr(arg_key)} is : {repr(self.key_dict["keys"][arg_key])}'
             )
         except Exception as err:
             self.err_logging(
@@ -287,8 +297,21 @@ class StrencCLI:
 
     # generate keys.json file
     
-    def gen_keys(self , genpath , gentype):
+    def gen_keys(self , genpath , gentype , arg_clen):
         
+        
+        if arg_clen:
+            self.clen_with_keygen = True
+            try:
+                chunk_length = int(arg_clen)
+            except Exception as err:
+                self.err_logging(err , "Chunk length value must be a integer")
+        else:
+            try:
+                chunk_length = int(input("Please enter chunk length value (Default =1)"))
+            except Exception as err:
+                chunk_length = 1
+                self.err_logging(err , "Chunk length value is not a integer.Defaulting to 1")               
         if gentype:
             self.type_with_genkeys = True
             try:
@@ -300,6 +323,8 @@ class StrencCLI:
                 self.debug_log("Made keys.json file")
                 ALPHABETS = string.printable
                 default_keys = {}
+                default_keys["chunk-length"] = chunk_length
+                default_keys["keys"] = {}
                 if gentype == 'manual':
                     used_assignments = []
                     for letter in ALPHABETS:
@@ -309,31 +334,44 @@ class StrencCLI:
                             )
                             if character_key in used_assignments:
                                 print(
-                                    f'Character {character_key} already assigned. Use another...'
+                                    f'Character {repr(character_key)} already assigned. Use another...'
                                 )
                                 continue
-                            elif len(character_key) != 1:
+                            elif len(character_key) != chunk_length:
                                 print(
-                                    'Input length is not equal to 1. Use another...'
+                                   f'Input length is not equal to {chunk_length}. Use another...'
                                 )
                                 continue
                             else:
                                 self.debug_log(
-                                    f"{letter} assigned to {character_key}"
+                                    f"r{repr(letter)} assigned to {repr(character_key)}"
                                 )
                                 break
 
                         used_assignments.append(character_key)
-                        default_keys[letter] = character_key
+                        default_keys["keys"][letter] = character_key
                 elif gentype == 'random':
                     ALPHABETS_LIST = list(ALPHABETS)
-
+                    used_assignments_rand = []
                     for letter in ALPHABETS:
-                        random_char = choice(ALPHABETS_LIST)
+                        temp_rand_key = []
+                        while True:
+                            for __ in range(chunk_length):
+                                temp_rand_key.append(choice(ALPHABETS_LIST))
+                            rand_char = "".join(temp_rand_key)
+                            
+                            if chunk_length > 1 and rand_char not in used_assignments_rand:
+                                used_assignments_rand.append(rand_char)            
+                                break
+                            elif chunk_length  == 1:
+                                ALPHABETS_LIST.remove(rand_char)
+                                break
+                            else:
+                                self.debug_log(f"Randomly generated value {repr(rand_char)} already exists")
+                            
+                            
 
-                        ALPHABETS_LIST.remove(random_char)
-
-                        default_keys[letter] = random_char
+                        default_keys["keys"][letter] = rand_char
                 else:
                     print(
                         'Either enter "manual" or "random" after -type. This will result in a empty "keys.json" file'
@@ -422,6 +460,7 @@ class StrencCLI:
             print('Run -type alongside -genpath')
         if arg_folds and not self.folds_with_file:
             print('Use argument -folds with either -encfile or -decfile')
+           
 
     # .txt file encoding
     
@@ -455,7 +494,7 @@ class StrencCLI:
 
                         #encode every character of the above list
                         for another_index, char in enumerate(list_form):
-                            list_form[another_index] = self.key_dict[char]
+                            list_form[another_index] = self.key_dict["keys"][char]
                         #replace original string with encoded one
                     if i < len(content_of_file) - 1:
                         content_of_file[i] = "".join(map(str,
@@ -470,7 +509,7 @@ class StrencCLI:
 
                 encoded_file.writelines(content_of_file)
             except Exception as err:
-                self.__err_logging(
+                self.err_logging(
                     err,
                     '-encfile failed. Either keys.json is missing or not given'
                 )
@@ -502,14 +541,14 @@ class StrencCLI:
                 try:
                     for i, line_to_change in enumerate(content_of_file_dec):
                         # change string to list for manipulation
-                        list_form_dec = list(line_to_change)
+                        list_form_dec = [line_to_change[split_c:split_c+self.clen] for split_c in range(0, len(line_to_change) , self.clen)]
                         for dec_folds in range(folds):
                             #encode every character of the above list
                             for another_index, char in enumerate(
                                     list_form_dec):
                                 list_form_dec[
                                     another_index] = get_key_from_value(
-                                        self.key_dict, char)
+                                        self.key_dict["keys"], char)
                         #replace original string with encoded one
                         if i < len(content_of_file_dec) - 1:
                             content_of_file_dec[i] = "".join(

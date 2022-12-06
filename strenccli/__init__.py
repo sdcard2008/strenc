@@ -32,7 +32,8 @@ def __main():
         "encfile" : strenc_cli.args.encodefile,
         "decfile" : strenc_cli.args.decodefile,
         "folds" : strenc_cli.args.folds,
-        "clen" : strenc_cli.args.chunklength
+        "clen" : strenc_cli.args.chunklength,
+        "val" : strenc_cli.args.value
     }
     
     
@@ -43,6 +44,8 @@ def __main():
     
     elif (ARGUMENT_VARS["key"]):
         strenc_cli.get_key(ARGUMENT_VARS["key"])
+    elif (ARGUMENT_VARS["val"]):
+        strenc_cli.get_value(ARGUMENT_VARS["val"])    
     elif (ARGUMENT_VARS["copy"]):
         strenc_cli.get_copy(ARGUMENT_VARS['copy'])
     elif (ARGUMENT_VARS["genpath"]):

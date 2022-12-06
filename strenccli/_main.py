@@ -12,12 +12,16 @@ import json
 def remove_all(to_remove, list: list):
     return [ele for ele in list if ele != to_remove]
 
+def intersperse(lst, item):
+    result = [item] * (len(lst) * 2 - 1)
+    result[0::2] = lst
+    return result
 
 def get_key_from_value(actual_dict, val):
     for key, value in actual_dict.items():
         if val == value:
             return key
-    return False
+    raise ValueError(f"key for {val} not found")
 
 
 class StrencCLI:
@@ -30,7 +34,7 @@ class StrencCLI:
     SYSTEM_ARGS = [{
         'com': '-k',
         'val': '--key',
-        'help': 'Get key of a specific char'
+        'help': 'Get value of specific key'
     }, {
         'com': '-copy',
         'val': '--copy',
@@ -90,6 +94,13 @@ class StrencCLI:
         '--chunklength',
         'help':
         'Decides length of each key'            
+    },{
+      'com':
+      '-val',
+      'val':
+      '--value',
+      'help':
+      'Get key for a specific value'             
     }]
     __author__ = 'Saptak De'
     
@@ -246,6 +257,9 @@ class StrencCLI:
                             break
 
                     self.key_dict["keys"][arg_change] = replace_with
+                    if self.clen == 1:
+                        self.debug_log("Chunklength is 1 , swapping values...")
+                        self.key_dict["keys"][replace_with] = arg_change
                     
                 else:
                     print(
@@ -273,14 +287,20 @@ class StrencCLI:
         
         try:
             print(
-                f'Key for {repr(arg_key)} is : {repr(self.key_dict["keys"][arg_key])}'
+                f'Value for key {repr(arg_key)} is : {repr(self.key_dict["keys"][arg_key])}'
             )
         except Exception as err:
             self.err_logging(
                 err,
                 '-k did not work. Either -path is wrong or it is absent. Or the character does not exist in the keys.json file'
             )
-
+    # get key for a specific value
+    
+    def get_value(self , arg_value):
+        try:
+            print(f'Key for value {repr(arg_value)} is : {repr(get_key_from_value(self.key_dict["keys"] , arg_value))}')        
+        except Exception as err:
+            self.err_logging(err , f"Error fetching key for value {arg_value}")
     # get a copy of keys.json file
     
     def get_copy(self , arg_copy):
@@ -321,7 +341,7 @@ class StrencCLI:
                     self.debug_log(f"Made directory {genpath}")
                 new_key_file = open(f'{genpath}/keys.json', 'x')
                 self.debug_log("Made keys.json file")
-                ALPHABETS = string.printable
+                ALPHABETS = string.ascii_letters + string.punctuation + string.digits
                 default_keys = {}
                 default_keys["chunk-length"] = chunk_length
                 default_keys["keys"] = {}
@@ -494,7 +514,8 @@ class StrencCLI:
 
                         #encode every character of the above list
                         for another_index, char in enumerate(list_form):
-                            list_form[another_index] = self.key_dict["keys"][char]
+                            if char not in string.whitespace:    
+                                list_form[another_index] = self.key_dict["keys"][char]
                         #replace original string with encoded one
                     if i < len(content_of_file) - 1:
                         content_of_file[i] = "".join(map(str,
@@ -531,31 +552,31 @@ class StrencCLI:
                     self.err_logging(err , 'value of argument -folds should be a integer')
             if exists(decfile_arg):
                 file_to_decode = open(decfile_arg, "r")
-                # gets all the line of the file
                 content_of_file_dec = file_to_decode.readlines()
                 #gets rid of all '\n' occurances
-                for index, line in enumerate(content_of_file_dec):
-                    if '\n' in line:
-                        content_of_file_dec[index] = line.replace('\n', '')
+                self.debug_log(f"Raw lines : {content_of_file_dec}")
                 # try to encode each line one by one.
+                
+                
+                
                 try:
-                    for i, line_to_change in enumerate(content_of_file_dec):
-                        # change string to list for manipulation
-                        list_form_dec = [line_to_change[split_c:split_c+self.clen] for split_c in range(0, len(line_to_change) , self.clen)]
+                    
+                        
+                    for i , line_to_encode in enumerate(content_of_file_dec):
+                        words_dec = intersperse(line_to_encode.split(" ") , " ")
+                        list_form_dec = [word_dec[split_c:split_c+self.clen] for word_dec in words_dec for split_c in range(0, len(word_dec) , self.clen)]
+                        self.debug_log(f"Line #{i+1} list {list_form_dec}")
                         for dec_folds in range(folds):
                             #encode every character of the above list
-                            for another_index, char in enumerate(
-                                    list_form_dec):
-                                list_form_dec[
-                                    another_index] = get_key_from_value(
-                                        self.key_dict["keys"], char)
+                            for another_index, char in enumerate(list_form_dec):
+                                self.debug_log(f"Length of current charcter (dec) is {len(char)}")
+                                if char not in string.whitespace:
+                                    list_form_dec[another_index] = get_key_from_value(self.key_dict["keys"], char)
+                                    
                         #replace original string with encoded one
-                        if i < len(content_of_file_dec) - 1:
-                            content_of_file_dec[i] = "".join(
-                                map(str, list_form_dec)) + '\n'
-                        else:
-                            content_of_file_dec[i] = "".join(
-                                map(str, list_form_dec))
+                        
+                        content_of_file_dec[i] = "".join(
+                            map(str, list_form_dec))
                     #make a new file and append encoded content in it
                     if "-encoded" not in decfile_arg:
                         decoded_file = open(

@@ -1,5 +1,5 @@
 import json as _json
-
+import string as _str
 
 """
 A very simple , customizable , string encoder and decoder.        
@@ -14,7 +14,9 @@ class Strenc:
     def __init__(self , key_path  = None):
         if key_path is not None:
             self.KeyFile = open(f'{key_path}/keys.json' , 'r+')
-            self.Keys = _json.load(self.KeyFile) 
+            self.keys_dict = _json.load(self.KeyFile)
+            self.clen = self.keys_dict["chunk-length"]
+            self.Keys = self.keys_dict["keys"] 
         else:
             self.Keys = None
             self.KeyFile = None   
@@ -24,7 +26,7 @@ class Strenc:
         try:
             self.KeyFile = open(f'{path}/keys.json' , 'r+')
 
-            return _json.load(self.KeyFile)
+            return _json.load(self.KeyFile)["keys"]
         except Exception as e:
             print(e)     
     @classmethod
@@ -32,7 +34,7 @@ class Strenc:
         try:
             self.KeyFile = open(f'{path}/keys.json' , 'r+')
 
-            self.Keys = _json.load(self.KeyFile)
+            self.Keys = _json.load(self.KeyFile)["keys"]
         except Exception as e:
             print(e)
                
@@ -46,7 +48,8 @@ class Strenc:
                 msg_letters = list(msg)
 
                 for letter_index ,letter in enumerate(msg_letters):
-                    msg_letters[letter_index] = keys[letter]
+                    if letter not in _str.whitespace:
+                        msg_letters[letter_index] = keys[letter]
                 msg = "".join(map(str,msg_letters))        
             if human_readable:
                 return repr(msg)
@@ -63,10 +66,14 @@ class Strenc:
         try:    
             for dec_fold in range(folds):
                     
-                msg_letters = list(msg)
-
+                msg_words = _intersperse(msg.split(' ') , ' ')
+                
+                
+                msg_letters = [word[split_c:split_c+self.clen] for word in msg_words for split_c in range(0, len(word) , self.clen)]
+                
                 for letter_index ,letter in enumerate(msg_letters):
-                    msg_letters[letter_index] = _get_key_from_value(keys , letter)
+                    if letter not in _str.whitespace:
+                        msg_letters[letter_index] = _get_key_from_value(keys , letter)
                 msg = "".join(map(str ,msg_letters))    
             if human_readable:
                 return repr(msg)
@@ -107,4 +114,7 @@ def _get_key_from_value(actual_dict  , val):
         if val == value:
             return key
     return False                
-        
+def  _intersperse(lst, item):
+    result = [item] * (len(lst) * 2 - 1)
+    result[0::2] = lst
+    return result        

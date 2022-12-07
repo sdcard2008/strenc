@@ -508,20 +508,21 @@ class StrencCLI:
             try:
                 for i, line_to_change in enumerate(content_of_file):
                     # change string to list for easier manipulation
-                    list_form = list(line_to_change)
+                    
+                    
 
                     for fold in range(folds):
-
+                        list_form = list(line_to_change)    
                         #encode every character of the above list
                         for another_index, char in enumerate(list_form):
                             if char not in string.whitespace:    
                                 list_form[another_index] = self.key_dict["keys"][char]
                         #replace original string with encoded one
-                    if i < len(content_of_file) - 1:
-                        content_of_file[i] = "".join(map(str,
+                        if i < len(content_of_file) - 1:
+                            content_of_file[i] = "".join(map(str,
                                                             list_form)) + '\n'
-                    else:
-                        content_of_file[i] = "".join(map(str, list_form))
+                        else:
+                            content_of_file[i] = "".join(map(str, list_form))
                 #make a new file and append encoded content in it
 
                 encoded_file = open(
@@ -562,11 +563,12 @@ class StrencCLI:
                 try:
                     
                         
-                    for i , line_to_encode in enumerate(content_of_file_dec):
-                        words_dec = intersperse(line_to_encode.split(" ") , " ")
-                        list_form_dec = [word_dec[split_c:split_c+self.clen] for word_dec in words_dec for split_c in range(0, len(word_dec) , self.clen)]
-                        self.debug_log(f"Line #{i+1} list {list_form_dec}")
+                    for i , line_to_decode in enumerate(content_of_file_dec):
+                        
+                        
                         for dec_folds in range(folds):
+                            words_dec = intersperse(line_to_decode.split(" ") , " ")
+                            list_form_dec = [word_dec[split_c:split_c+self.clen] for word_dec in words_dec for split_c in range(0, len(word_dec) , self.clen)]
                             #encode every character of the above list
                             for another_index, char in enumerate(list_form_dec):
                                 self.debug_log(f"Length of current charcter (dec) is {len(char)}")
@@ -575,7 +577,7 @@ class StrencCLI:
                                     
                         #replace original string with encoded one
                         
-                        content_of_file_dec[i] = "".join(
+                            content_of_file_dec[i] = "".join(
                             map(str, list_form_dec))
                     #make a new file and append encoded content in it
                     if "-encoded" not in decfile_arg:

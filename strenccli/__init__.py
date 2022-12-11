@@ -10,7 +10,7 @@ from strenccli._main import StrencCLI
 
 def __main():
     default_conf = "strenconf.ini"
-    strenc_cli = StrencCLI ("0.2.9" , configparser , argparse , logging)
+    strenc_cli = StrencCLI ("0.3.0" , configparser , argparse , logging)
     
     # calling init functions
     
@@ -33,7 +33,8 @@ def __main():
         "decfile" : strenc_cli.args.decodefile,
         "folds" : strenc_cli.args.folds,
         "clen" : strenc_cli.args.chunklength,
-        "val" : strenc_cli.args.value
+        "val" : strenc_cli.args.value,
+        "seed" : strenc_cli.args.seed
     }
     
     
@@ -55,11 +56,11 @@ def __main():
     elif (ARGUMENT_VARS["config"]):
         strenc_cli.config_func(default_conf , ARGUMENT_VARS["config"])
     elif (ARGUMENT_VARS["encfile"]):
-        strenc_cli.encode_file(ARGUMENT_VARS["encfile"] ,ARGUMENT_VARS["folds"])
+        strenc_cli.encode_file(ARGUMENT_VARS["encfile"] ,ARGUMENT_VARS["folds"] , ARGUMENT_VARS["seed"])
     elif (ARGUMENT_VARS["decfile"]):
-        strenc_cli.decode_file(ARGUMENT_VARS["decfile"] , ARGUMENT_VARS["folds"])
+        strenc_cli.decode_file(ARGUMENT_VARS["decfile"] , ARGUMENT_VARS["folds"] , ARGUMENT_VARS["seed"])
     
     # gatekeep
     
-    strenc_cli.gatekeep(ARGUMENT_VARS["genkeytype"] , ARGUMENT_VARS["folds"])
+    strenc_cli.gatekeep(ARGUMENT_VARS["genkeytype"] , ARGUMENT_VARS["folds"] , ARGUMENT_VARS["seed"])
     

@@ -2,7 +2,7 @@ from os.path import exists
 from os import makedirs
 from os import remove
 from os.path import basename
-from random import choice
+import random
 import string
 import json
 # util functions (self explanatory)
@@ -23,6 +23,44 @@ def get_key_from_value(actual_dict, val):
             return key
     raise ValueError(f"key for {val} not found")
 
+def return_seed_value(seed_and_clen : str):
+    specific_clen = 1
+    try:
+        seed , specific_clen = [int (section) for section in seed_and_clen.split("@")]
+    except:
+        pass    
+    tmp_return_value = {}
+    tmp_return_value["chunk-length"] = specific_clen
+    tmp_return_value["keys"] = {}
+    ALPHABETS = string.ascii_letters + string.punctuation + string.digits
+    ALPHABETS_LIST = list(ALPHABETS)
+    random.seed(seed)
+    
+    rand_state = random.getstate()
+    
+    random.setstate(rand_state)
+    used_assignments_rand = []
+    for letter in ALPHABETS:
+        temp_rand_key = []
+        while True:
+            for __ in range(specific_clen):
+                temp_rand_key.append(random.choice(ALPHABETS_LIST))
+            rand_char = "".join(temp_rand_key)
+            
+            if specific_clen > 1 and rand_char not in used_assignments_rand:
+                used_assignments_rand.append(rand_char)            
+                break
+            elif specific_clen  == 1:
+                ALPHABETS_LIST.remove(rand_char)
+                break
+            
+            
+            
+
+        tmp_return_value["keys"][letter] = rand_char
+    return tmp_return_value
+    
+    
 
 class StrencCLI:
     
@@ -101,6 +139,13 @@ class StrencCLI:
       '--value',
       'help':
       'Get key for a specific value'             
+    },{
+      'com':
+      '-s',
+      'val':
+      '--seed',
+      'help':
+      'Use a specific seed instead of a key file'             
     }]
     __author__ = 'Saptak De'
     
@@ -176,6 +221,8 @@ class StrencCLI:
     type_with_genkeys = False
     folds_with_file = False
     clen_with_keygen = False
+    seed_with_file = False
+    
     
     # initialize key related variables
     
@@ -377,7 +424,7 @@ class StrencCLI:
                         temp_rand_key = []
                         while True:
                             for __ in range(chunk_length):
-                                temp_rand_key.append(choice(ALPHABETS_LIST))
+                                temp_rand_key.append(random.choice(ALPHABETS_LIST))
                             rand_char = "".join(temp_rand_key)
                             
                             if chunk_length > 1 and rand_char not in used_assignments_rand:
@@ -475,18 +522,21 @@ class StrencCLI:
 
     # run gatekeep
     
-    def gatekeep(self , gentype , arg_folds):
+    def gatekeep(self , gentype , arg_folds , arg_seed):
         if gentype and not self.type_with_genkeys:
             print('Run -type alongside -genpath')
         if arg_folds and not self.folds_with_file:
             print('Use argument -folds with either -encfile or -decfile')
+        if arg_seed and not self.seed_with_file:
+            print('Use argument -s or --seed with either -encfile or -decfile')    
            
 
     # .txt file encoding
     
-    def encode_file(self , encfile , arg_folds):
+    def encode_file(self , encfile , arg_folds , arg_seed):
         
         self.folds_with_file = True
+        self.seed_with_file = True
         folds = 1
         #get value of 'folds' if given
         if arg_folds:
@@ -495,7 +545,13 @@ class StrencCLI:
             except Exception as err:
                 self.err_logging(
                     err, 'value of argument -folds should be a integer')
-
+        # use seed if given , else use the given key file
+        
+        if arg_seed:
+            try:
+                self.key_dict  = return_seed_value(arg_seed)
+            except Exception as err:
+                self.err_logging(err , "Value of -s or --seed should be a integer")    
         if exists(encfile):
             file_to_encode = open(encfile, "r")
             # gets all the line of the file
@@ -541,9 +597,10 @@ class StrencCLI:
 
     # decode a encoded file
     
-    def decode_file(self , decfile_arg , arg_folds):
+    def decode_file(self , decfile_arg , arg_folds , arg_seed):
         if decfile_arg:
             self.folds_with_file = True
+            self.seed_with_file = True
             folds = 1
             #get value of 'folds' if given
             if arg_folds:
@@ -551,6 +608,12 @@ class StrencCLI:
                     folds = int(arg_folds)
                 except Exception as err:
                     self.err_logging(err , 'value of argument -folds should be a integer')
+            if arg_seed:
+                try:
+                    self.key_dict = return_seed_value(arg_seed)
+                    self.clen = self.key_dict["chunk-length"]
+                except Exception as err:
+                    self.err_logging(err , "Value of -s or --seed should be a integer")            
             if exists(decfile_arg):
                 file_to_decode = open(decfile_arg, "r")
                 content_of_file_dec = file_to_decode.readlines()

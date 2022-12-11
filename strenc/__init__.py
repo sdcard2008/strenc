@@ -1,22 +1,28 @@
 import json as _json
 import string as _str
+import random as _rand
 
 """
-A very simple , customizable , string encoder and decoder.        
+A very simple , customizable , _str encoder and decoder.        
 """
 
-__version__ = "0.2.9"
+__version__ = "0.3.0"
 __author__ = "Saptak De"
 
 
 class Strenc:
     @classmethod
-    def __init__(self , key_path  = None):
+    def __init__(self , key_path  = None , seed : int = None):
         if key_path is not None:
             self.KeyFile = open(f'{key_path}/keys.json' , 'r+')
             self.keys_dict = _json.load(self.KeyFile)
             self.clen = self.keys_dict["chunk-length"]
-            self.Keys = self.keys_dict["keys"] 
+            self.Keys = self.keys_dict["keys"]
+        
+        elif seed is not None:
+            self.keys_dict = _return_seed_value(seed)
+            self.clen = self.keys_dict["chunk-length"]
+            self.Keys = self.keys_dict["keys"]         
         else:
             self.Keys = None
             self.KeyFile = None   
@@ -38,7 +44,12 @@ class Strenc:
         except Exception as e:
             print(e)
                
-
+    def load_keys_seed(self , seed:int):
+        try:
+            self.Keys = _return_seed_value(seed)["keys"]
+        except Exception as e:
+            print(e)
+            
     @classmethod
     def encode(self  , msg:str , human_readable : bool = False , keys : dict = None , folds=1):
         if keys is None:
@@ -118,3 +129,40 @@ def  _intersperse(lst, item):
     result = [item] * (len(lst) * 2 - 1)
     result[0::2] = lst
     return result        
+def _return_seed_value(seed_and_clen : str):
+    tmp_return_value = {}
+    specific_clen = 1
+    try:
+       seed , specific_clen = [int(i) for i in seed_and_clen.split("@")]
+    except:
+        pass    
+    tmp_return_value["chunk-length"] = specific_clen
+    tmp_return_value["keys"] = {}
+    ALPHABETS = _str.ascii_letters + _str.punctuation + _str.digits
+    ALPHABETS_LIST = list(ALPHABETS)
+    _rand.seed(seed)
+    
+    rand_state = _rand.getstate()
+    
+    _rand.setstate(rand_state)
+    used_assignments_rand = []
+    for letter in ALPHABETS:
+        temp_rand_key = []
+        while True:
+            for __ in range(specific_clen):
+                temp_rand_key.append(_rand.choice(ALPHABETS_LIST))
+            rand_char = "".join(temp_rand_key)
+            
+            if specific_clen > 1 and rand_char not in used_assignments_rand:
+                used_assignments_rand.append(rand_char)            
+                break
+            elif specific_clen  == 1:
+                ALPHABETS_LIST.remove(rand_char)
+                break
+            
+            
+            
+
+        tmp_return_value["keys"][letter] = rand_char
+    return tmp_return_value
+    

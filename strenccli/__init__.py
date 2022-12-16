@@ -8,6 +8,7 @@ import logging
 from strenccli._main import StrencCLI
 
 
+
 def __main():
     default_conf = "strenconf.ini"
     strenc_cli = StrencCLI ("0.3.0" , configparser , argparse , logging)

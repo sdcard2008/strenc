@@ -68,15 +68,11 @@ class StrencCLI:
     DEBUG = 'false'
     path_to_keys = None
     
-    # all commands and arguments
+    # commands and arguments that requires value
     SYSTEM_ARGS = [{
         'com': '-k',
         'val': '--key',
         'help': 'Get value of specific key'
-    }, {
-        'com': '-copy',
-        'val': '--copy',
-        'help': 'Get a copy of the keys'
     }, {
         'com':
         '-change',
@@ -92,10 +88,6 @@ class StrencCLI:
         'com': '-path',
         'val': '--keypath',
         'help': 'Loaction of keys.json'
-    }, {
-        'com': '-v',
-        'val': '--version',
-        'help': 'Outputs installed version of strenc'
     }, {
         'com':
         '-config',
@@ -147,6 +139,16 @@ class StrencCLI:
       'help':
       'Use a specific seed instead of a key file'             
     }]
+    # query commands
+    QUERY_ARGS = [ {
+        'com': '-v',
+        'val': '--version',
+        'help': 'Outputs installed version of strenc',
+    },  {
+        'com': '-copy',
+        'val': '--copy',
+        'help': 'Get a copy of the keys'
+    }]
     __author__ = 'Saptak De'
     
     def __init__(self, version_arg: str, config_parser, argparser,
@@ -178,6 +180,10 @@ class StrencCLI:
             self.arg_parser.add_argument(command['com'],
                                      command['val'],
                                      help=command['help'])
+        for command_bool in self.QUERY_ARGS:
+            self.arg_parser.add_argument(command_bool['com'],
+                                     command_bool['val'],
+                                     help=command_bool['help'] , action = 'store_true')    
 
         self.args = self.arg_parser.parse_args()  # initialize args fetcher
         
@@ -351,7 +357,7 @@ class StrencCLI:
     # get a copy of keys.json file
     
     def get_copy(self , arg_copy):
-        if arg_copy == 'true':    
+        if arg_copy:    
             try:
                 print(self.key_dict)
             except Exception as err:
@@ -359,9 +365,7 @@ class StrencCLI:
                 err,
                 '-copy did not work. Either -path is wrong or it is absent.'
                 )
-        else:
-            print("Add true after -copy")        
-
+        
     # generate keys.json file
     
     def gen_keys(self , genpath , gentype , arg_clen):
@@ -375,7 +379,7 @@ class StrencCLI:
                 self.err_logging(err , "Chunk length value must be a integer")
         else:
             try:
-                chunk_length = int(input("Please enter chunk length value (Default =1)"))
+                chunk_length = int(input("Please enter chunk length value (Default =1) : "))
             except Exception as err:
                 chunk_length = 1
                 self.err_logging(err , "Chunk length value is not a integer.Defaulting to 1")               
@@ -458,10 +462,9 @@ class StrencCLI:
     # show current strenc version
     
     def show_version(self , arg_show):
-        if arg_show == 'show':
+        if arg_show:
             print(f'strenc version {self.__version__}')
-        else:
-            print('Please add show after -v')
+        
 
     # setup or change config file
     

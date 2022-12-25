@@ -137,7 +137,7 @@ class StrencCLI:
       'val':
       '--seed',
       'help':
-      'Use a specific seed instead of a key file'             
+      'Use a specific seed instead of a key file. Format: [seed/chunklength]'             
     }]
     # query commands
     QUERY_ARGS = [ {

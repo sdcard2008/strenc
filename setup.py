@@ -10,7 +10,7 @@ if os.path.isfile(requirement_path):
         install_requires = f.read().splitlines()
 setup(
     name="strenc" ,
-    version="0.3.0" ,
+    version="0.3.1" ,
     description="A simple fully customizable string encoder and decoder" ,
     url="https://github.com/sdcard2008/strenc" ,  #will add later 
     author="Saptak De" ,

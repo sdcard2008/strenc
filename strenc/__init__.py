@@ -6,7 +6,7 @@ import random as _rand
 A very simple , customizable , _str encoder and decoder.        
 """
 
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 __author__ = "Saptak De"
 
 

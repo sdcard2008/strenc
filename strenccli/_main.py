@@ -5,6 +5,7 @@ from os.path import basename
 import random
 import string
 import json
+from datetime import datetime
 # util functions (self explanatory)
 
 
@@ -193,13 +194,15 @@ class StrencCLI:
     # initializing the logger
     
     def init_logger(self):
+        now = datetime.now()
         if self.DEBUG == 'true':
-            self.logger.basicConfig(filename='strenc.log',
+            if not exists("./log/"):
+                makedirs("./log/")
+            self.logger.basicConfig(filename=f'log/strenc_{now.strftime("%H-%M-%S")}.log',
                                            filemode='w',
                                            format='%(asctime)s - %(message)s',
                                            level=self.logger.NOTSET)
-        elif exists('strenc.log') and self.DEBUG == 'false':
-            remove('strenc.log')
+        
         
     # initialize configuration system
     

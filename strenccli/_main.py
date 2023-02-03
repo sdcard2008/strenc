@@ -568,17 +568,18 @@ class StrencCLI:
 
             # try to encode each line one by one.
             try:
-                for i, line_to_change in enumerate(content_of_file):
+                for fold in range(folds):
                     # change string to list for easier manipulation
                     
                     
 
-                    for fold in range(folds):
+                    for i, line_to_change in enumerate(content_of_file):
                         list_form = list(line_to_change)    
                         #encode every character of the above list
                         for another_index, char in enumerate(list_form):
                             if char not in string.whitespace:    
                                 list_form[another_index] = self.key_dict["keys"][char]
+                                self.debug_log(f"Changed {char} to {self.key_dict['keys'][char]}")
                         #replace original string with encoded one
                         if i < len(content_of_file) - 1:
                             content_of_file[i] = "".join(map(str,
@@ -632,10 +633,10 @@ class StrencCLI:
                 try:
                     
                         
-                    for i , line_to_decode in enumerate(content_of_file_dec):
+                    for dec_folds in range(folds):
                         
                         
-                        for dec_folds in range(folds):
+                        for i , line_to_decode in enumerate(content_of_file_dec):
                             words_dec = intersperse(line_to_decode.split(" ") , " ")
                             list_form_dec = [word_dec[split_c:split_c+self.clen] for word_dec in words_dec for split_c in range(0, len(word_dec) , self.clen)]
                             #encode every character of the above list

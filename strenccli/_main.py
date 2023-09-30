@@ -62,7 +62,36 @@ def return_seed_value(seed_and_clen : str):
     return tmp_return_value
     
     
-
+def swap(str , seed):
+    if seed:
+        random.seed(seed)
+        rand_state = random.getstate()
+        random.setstate(rand_state)
+    count = list(range(len(str)))
+     
+    count_rand = []
+    
+    for ___ in range(len(str)):
+        choice = random.choice(count)
+        count_rand.append(choice)
+        
+        count.remove(choice)
+        
+    for k in range(1,len(count_rand),2):
+        returned_string = list(str) 
+        
+        sw1 = count_rand[k-1:k+1][0]
+        sw2 = count_rand[k-1:k+1][1]
+        
+        returned_string[sw1] = str[sw2]
+        returned_string[sw2] = str[sw1]
+        
+    return "".join(returned_string)    
+            
+             
+                
+            
+        
 class StrencCLI:
     
     
@@ -543,6 +572,7 @@ class StrencCLI:
         
         self.folds_with_file = True
         self.seed_with_file = True
+        self.seq_with_file = True
         folds = 1
         #get value of 'folds' if given
         if arg_folds:
@@ -557,7 +587,10 @@ class StrencCLI:
             try:
                 self.key_dict  = return_seed_value(arg_seed)
             except Exception as err:
-                self.err_logging(err , "Value of -s or --seed should be a integer")    
+                self.err_logging(err , "Value of -s or --seed should be a integer")
+        
+                    
+                            
         if exists(encfile):
             file_to_encode = open(encfile, "r")
             # gets all the line of the file

@@ -3,7 +3,7 @@ import string as _str
 import random as _rand
 
 """
-A very simple , customizable , _str encoder and decoder.        
+A very simple , customizable , string encoder and decoder.        
 """
 
 __version__ = "0.3.2"

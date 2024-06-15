@@ -89,7 +89,8 @@ def swap(str , seed):
     return "".join(returned_string)    
             
              
-                
+
+                    
             
         
 class StrencCLI:
@@ -572,7 +573,6 @@ class StrencCLI:
         
         self.folds_with_file = True
         self.seed_with_file = True
-        self.seq_with_file = True
         folds = 1
         #get value of 'folds' if given
         if arg_folds:
